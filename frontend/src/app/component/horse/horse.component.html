@@ -1,0 +1,124 @@
+<!-- SANITY CHECK BANNER
+    This is just for checking, that your setup works.
+    You can – and should – remove this later
+    -->
+<div class="container mt-3 mb-3" *ngIf="bannerError">
+  <div class="alert alert-danger" role="alert">
+    <h4>Error!</h4> {{ error }}
+    <p>Could not load horses.</p>
+    <p>Something is not quite right. Did you start the backend?</p>
+  </div>
+</div>
+
+<div class="container mt-3" *ngIf="!bannerError && horses">
+  <div class="alert alert-success" role="alert">
+    <h4 class="alert-heading">Well done!</h4>
+    <p>Your application is up and running.</p>
+    <p>You should see the current list of horses below.</p>
+  </div>
+</div>
+<!-- END SANITY CHECK BANNER -->
+
+<div class="d-flex flex-row w-auto">
+  <button class="btn btn-primary mr-1" (click)="reloadHorses()" aria-label="Reload horses">
+    <i class="bi bi-arrow-clockwise"></i>
+    Reload
+  </button>
+  <span style="flex: 1"></span>
+  <a class="btn btn-secondary" routerLink="create" aria-label="New horse">
+    <i class="bi bi-plus-lg"></i>
+    New horse
+  </a>
+</div>
+
+<form class="d-flex flex-row w-auto mb-3" (submit)="reloadHorses()">
+  <!-- this button is here, just so that simple submitting of this form
+       to reload the horses, is possible -->
+  <button type="submit" hidden="true">submit</button>
+  <div class="flex-grow-2">
+    <label for="searchHorseName" class="col-form-label">
+      Name
+    </label>
+    <input type="text" name="searchHorseName"
+           class="form-control"
+           >
+  </div>
+  <div class="flex-grow-1 ms-1">
+    <label for="searchHorseDescription" class="col-form-label">
+      Description
+    </label>
+    <input type="text" name="searchHorseDescription"
+           class="form-control"
+           >
+  </div>
+  <div class="ms-1">
+    <label for="searchHorseDateOfBirth" class="col-form-label">
+      Date of Birth
+    </label>
+    <!-- pattern and placeholder are fallbacks for browser, that use a simple text input for type="date"
+         The date format of the plain HTML date input, in browser that support it is, sadly, not changeable in a cross-browser way
+      -->
+    <input type="date" name="searchHorseDateOfBirth"
+           pattern="\d{4}-\d{2}-\d{2}"
+           placeholder="yyyy-mm-dd"
+           class="form-control"
+           >
+  </div>
+  <div class="ms-1">
+    <label for="searchHorseSex" class="col-form-label">
+      Sex
+    </label>
+    <select name="searchHorseSex"
+            class="form-select"
+            >
+      <option></option>
+      <option value="FEMALE">Female</option>
+      <option value="MALE">Male</option>
+    </select>
+  </div>
+  <div class="flex-grow-2 ms-1">
+    <label for="searchHorseOwner" class="col-form-label">
+      Owner
+    </label>
+    <app-autocomplete name="searchHorseOwner"
+                      textInputClass="form-control"
+                      valueNeedsToMatchSuggestion="false"
+                      >
+    </app-autocomplete>
+  </div>
+</form>
+
+<div class="mt-3">
+  <table class="table table-hover">
+    <thead>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Date of Birth</th>
+      <th>Sex</th>
+      <th>Owner</th>
+      <th class="min-width">Actions</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let horse of horses" class="center-td">
+        <td>{{horse.name}}</td>
+        <td>{{horse.description}}</td>
+        <td>{{dateOfBirthAsLocaleDate(horse)}}</td>
+        <td>{{horse.sex === 'FEMALE' ? 'Female' : 'Male'}}</td>
+        <td>{{ownerName(horse.owner)}}</td>
+        <td>
+          <div class="btn-group">
+            <a class="btn btn-sm responsive-info-button"
+               aria-label="Show horse details">
+              <i class="bi bi-info-lg"></i>
+            </a>
+            <a class="btn btn-sm responsive-warning-button"
+               [routerLink]="['edit', horse.id]"
+               aria-label="Edit horse">
+              <i class="bi bi-pencil"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
