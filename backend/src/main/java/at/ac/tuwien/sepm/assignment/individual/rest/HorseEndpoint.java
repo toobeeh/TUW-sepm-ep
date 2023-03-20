@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,24 +60,25 @@ public class HorseEndpoint {
 
 
   @PutMapping("{id}")
-  public HorseDetailDto update(@PathVariable long id, @RequestBody HorseDetailDto toUpdate) throws ValidationException, ConflictException {
+  public HorseDetailDto update(@PathVariable long id, @RequestBody HorseDetailDto toUpdate) throws ValidationException, ConflictException, NotFoundException {
     LOG.info("PUT " + BASE_PATH + "/{}", toUpdate);
     LOG.debug("Body of request:\n{}", toUpdate);
-    try {
-      return service.update(toUpdate.withId(id));
-    } catch (NotFoundException e) {
-      HttpStatus status = HttpStatus.NOT_FOUND;
-      logClientError(status, "Horse to update not found", e);
-      throw new ResponseStatusException(status, e.getMessage(), e);
-    }
+    return service.update(toUpdate.withId(id));
   }
 
 
   @PostMapping()
   public HorseDetailDto create(@RequestBody HorseCreateDto toCreate) throws ConflictException, ValidationException {
-    LOG.info("POST " + BASE_PATH + "/{}", toCreate);
+    LOG.info("POST " + BASE_PATH);
     LOG.debug("Body of request:\n{}", toCreate);
     return service.create(toCreate);
+  }
+
+
+  @DeleteMapping("{id}")
+  public void delete(@PathVariable long id) throws NotFoundException {
+    LOG.info("DELETE " + BASE_PATH + "/{}", id);
+    service.delete(id);
   }
 
 

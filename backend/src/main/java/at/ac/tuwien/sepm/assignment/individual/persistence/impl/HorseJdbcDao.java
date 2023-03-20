@@ -32,6 +32,7 @@ public class HorseJdbcDao implements HorseDao {
   private static final String TABLE_NAME = "horse";
   private static final String SQL_SELECT_ALL = "SELECT * FROM " + TABLE_NAME;
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+  private static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
   private static final String SQL_UPDATE = "UPDATE " + TABLE_NAME
       + " SET name = ?"
       + "  , description = ?"
@@ -71,6 +72,16 @@ public class HorseJdbcDao implements HorseDao {
     }
 
     return horses.get(0);
+  }
+
+  @Override
+  public void delete(long id) throws NotFoundException {
+    LOG.trace("delete({})", id);
+    int updated = jdbcTemplate.update(SQL_DELETE, id);
+
+    if (updated == 0) {
+      throw new NotFoundException("Could not update horse with ID " + id + ", because it does not exist");
+    }
   }
 
 

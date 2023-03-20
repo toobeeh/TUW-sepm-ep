@@ -49,4 +49,12 @@ public interface HorseDao {
    * @throws NotFoundException if the Horse with the given ID does not exist in the persistent data store
    */
   Horse getById(long id) throws NotFoundException;
+
+  /**
+   * Delete a horse by its ID from the persistent data store.
+   *
+   * @param id the ID of the horse to delete
+   * @throws NotFoundException if the Horse with the given ID does not exist in the persistent data store
+   */
+  void delete(long id) throws NotFoundException;
 }

@@ -56,4 +56,12 @@ public interface HorseService {
    * @throws NotFoundException if the horse with the given ID does not exist in the persistent data store
    */
   HorseDetailDto getById(long id) throws NotFoundException;
+
+  /**
+   * Deletes the horse with given ID.
+   *
+   * @param id the ID of the horse to delete
+   * @throws NotFoundException if the horse with the given ID does not exist in the persistent data store
+   */
+  void delete(long id) throws NotFoundException;
 }
