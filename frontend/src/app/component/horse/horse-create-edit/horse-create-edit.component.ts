@@ -47,6 +47,8 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'Create New Horse';
+      case HorseCreateEditMode.edit:
+        return 'Edit Horse ' + this.horse.name;
       default:
         return '?';
     }
@@ -56,6 +58,8 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'Create';
+      case HorseCreateEditMode.edit:
+        return 'Edit';
       default:
         return '?';
     }
@@ -70,6 +74,8 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'created';
+      case HorseCreateEditMode.edit:
+        return 'updated';
       default:
         return '?';
     }
@@ -82,6 +88,24 @@ export class HorseCreateEditComponent implements OnInit {
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.mode = data.mode;
+      if(data.mode === HorseCreateEditMode.edit){
+        const id = Number(this.route.snapshot.paramMap.get('id'));
+        if(Number.isNaN(id)){
+          this.notification.error('Could not load horse to edit');
+          this.router.navigate(['/horses']);
+        }
+        else {
+          this.service.get(id).subscribe({
+            next: horse => {
+              this.horse = horse;
+            },
+            error: response => {
+              this.notification.error('Could not load horse to edit');
+              this.router.navigate(['/horses']);
+            }
+          });
+        }
+      }
     });
   }
 
@@ -112,6 +136,9 @@ export class HorseCreateEditComponent implements OnInit {
         case HorseCreateEditMode.create:
           observable = this.service.create(this.horse);
           break;
+        case HorseCreateEditMode.create:
+          observable = this.service.update(this.horse);
+          break;
         default:
           console.error('Unknown HorseCreateEditMode', this.mode);
           return;
@@ -131,8 +158,8 @@ export class HorseCreateEditComponent implements OnInit {
               message = 'Something went wrong';
               break;
           }
-          this.notification.error(`Horse ${this.horse.name} could not be created: \n${message}`);
-          console.error('Error creating horse', response);
+          this.notification.error(`Horse ${this.horse.name} could not be ${this.modeActionFinished}: \n${message}`);
+          console.error('Error creating/updating horse', response, this.modeIsCreate);
         }
       });
     }
