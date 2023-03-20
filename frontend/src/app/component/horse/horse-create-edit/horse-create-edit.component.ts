@@ -14,6 +14,7 @@ import {OwnerService} from 'src/app/service/owner.service';
 export enum HorseCreateEditMode {
   create,
   edit,
+  view
 };
 
 @Component({
@@ -23,6 +24,7 @@ export enum HorseCreateEditMode {
 })
 export class HorseCreateEditComponent implements OnInit {
 
+  public readonly modes = HorseCreateEditMode;
   mode: HorseCreateEditMode = HorseCreateEditMode.create;
   horse: Horse = {
     name: '',
@@ -49,6 +51,8 @@ export class HorseCreateEditComponent implements OnInit {
         return 'Create New Horse';
       case HorseCreateEditMode.edit:
         return 'Edit Horse ' + this.horse.name;
+      case HorseCreateEditMode.view:
+        return 'Details of Horse ' + this.horse.name;
       default:
         return '?';
     }
@@ -67,6 +71,10 @@ export class HorseCreateEditComponent implements OnInit {
 
   get modeIsCreate(): boolean {
     return this.mode === HorseCreateEditMode.create;
+  }
+
+  get modeIsView(): boolean {
+    return this.mode === HorseCreateEditMode.view;
   }
 
 
@@ -92,7 +100,7 @@ export class HorseCreateEditComponent implements OnInit {
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.mode = data.mode;
-      if(data.mode === HorseCreateEditMode.edit){
+      if(data.mode !== HorseCreateEditMode.create){
         const id = Number(this.route.snapshot.paramMap.get('id'));
         if(Number.isNaN(id)){
           this.notification.error('Could not load horse to edit');
