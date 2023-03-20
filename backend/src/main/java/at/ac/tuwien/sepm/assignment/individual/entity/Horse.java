@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.assignment.individual.entity;
 
 import at.ac.tuwien.sepm.assignment.individual.type.Sex;
+
 import java.time.LocalDate;
 
 /**
@@ -13,6 +14,8 @@ public class Horse {
   private LocalDate dateOfBirth;
   private Sex sex;
   private Long ownerId;
+  private Long fatherId;
+  private Long motherId;
 
   public Long getId() {
     return id;
@@ -59,6 +62,23 @@ public class Horse {
     return this;
   }
 
+  public Long getFatherId() {
+    return fatherId;
+  }
+
+  public Horse setFatherId(Long fatherId) {
+    this.fatherId = fatherId;
+    return this;
+  }
+
+  public Long getMotherId() {
+    return motherId;
+  }
+
+  public Horse setMotherId(Long motherId) {
+    this.motherId = motherId;
+    return this;
+  }
 
   public Long getOwnerId() {
     return ownerId;
@@ -78,6 +98,8 @@ public class Horse {
         + ", dateOfBirth=" + dateOfBirth
         + ", sex=" + sex
         + ", ownerId=" + ownerId
+        + ", motherId=" + fatherId
+        + ", fatherId=" + motherId
         + '}';
   }
 }

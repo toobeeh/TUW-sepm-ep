@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.assignment.individual.service.impl;
 
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
+import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 
@@ -59,31 +60,65 @@ public class HorseValidator {
     }
   }
 
-  public void validateForUpdate(HorseDetailDto horse) throws ValidationException, ConflictException {
+  private void validateParents(List<String> validationErrors, Horse father, Horse mother, LocalDate childBirth, Long childId) {
+    if (mother != null && mother.getId() == childId) {
+      validationErrors.add("Mother horse is the same as child");
+    }
+    if (father != null && father.getId() == childId) {
+      validationErrors.add("Father horse is the same as child");
+    }
+    if (mother != null && mother.getSex() != Sex.FEMALE) {
+      validationErrors.add("Mother horse is not female");
+    }
+    if (father != null && father.getSex() != Sex.MALE) {
+      validationErrors.add("Father horse is not male");
+    }
+    if (mother != null && mother.getDateOfBirth().isAfter(childBirth)) {
+      validationErrors.add("Mother horse is younger than child");
+    }
+    if (father != null && father.getDateOfBirth().isAfter(childBirth)) {
+      validationErrors.add("Father horse is younger than child");
+    }
+  }
+
+  public void validateForUpdate(HorseDetailDto horse, Horse father, Horse mother) throws ValidationException, ConflictException {
     LOG.trace("validateForUpdate({})", horse);
     List<String> validationErrors = new ArrayList<>();
+    List<String> validationConflicts = new ArrayList<>();
 
     // the most reusable way since there is no polymorphism in the DTOs, yuck...
     validateID(validationErrors, horse.id());
     validateDescription(validationErrors, horse.description());
     validateSex(validationErrors, horse.sex());
-
+    validateBirth(validationErrors, horse.dateOfBirth());
     if (!validationErrors.isEmpty()) {
       throw new ValidationException("Validation of horse for update failed", validationErrors);
     }
+
+    // check for conflicts if validation passed
+    validateParents(validationConflicts, father, mother, horse.dateOfBirth(), horse.id());
+    if (!validationConflicts.isEmpty()) {
+      throw new ConflictException("Data of horse for update has conflicts", validationConflicts);
+    }
   }
 
-  public void validateForInsert(HorseCreateDto horse) throws ValidationException {
+  public void validateForInsert(HorseCreateDto horse, Horse father, Horse mother) throws ValidationException, ConflictException {
     LOG.trace("validateForInsert({})", horse);
     List<String> validationErrors = new ArrayList<>();
+    List<String> validationConflicts = new ArrayList<>();
 
     validateDescription(validationErrors, horse.description());
     validateSex(validationErrors, horse.sex());
     validateName(validationErrors, horse.name());
     validateBirth(validationErrors, horse.dateOfBirth());
-
     if (!validationErrors.isEmpty()) {
       throw new ValidationException("Validation of horse for create failed", validationErrors);
+    }
+
+    // check for conflicts if validation passed
+    validateParents(validationConflicts, father, mother, horse.dateOfBirth(), null);
+    if (!validationConflicts.isEmpty()) {
+      throw new ConflictException("Data of horse for create has conflicts", validationConflicts);
     }
   }
 

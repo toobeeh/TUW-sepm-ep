@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.service;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
@@ -32,9 +33,8 @@ public interface HorseService {
    * @throws ValidationException if the update data given for the horse is in itself incorrect (description too long, no name, …)
    * @throws ConflictException   if the update data given for the horse is in conflict the data currently in the system (owner does not exist, …)
    */
-  HorseDetailDto update(HorseDetailDto horse) throws NotFoundException, ValidationException, ConflictException;
-
-
+  HorseChildDetailDto update(HorseChildDetailDto horse) throws NotFoundException, ValidationException, ConflictException;
+  
   /**
    * Creates the horse with the data given in {@code horse}
    * in the persistent data store.
@@ -44,7 +44,7 @@ public interface HorseService {
    * @throws ValidationException if the creation data given for the horse is in itself incorrect (description too long, no name, …)
    * @throws ConflictException   if the update data given for the horse is in conflict the data currently in the system (owner does not exist, …)
    */
-  HorseDetailDto create(HorseCreateDto horse) throws ValidationException, ConflictException;
+  HorseChildDetailDto create(HorseCreateDto horse) throws ValidationException, ConflictException, NotFoundException;
 
   /**
    * Get the horse with given ID, with more detail information.
@@ -55,7 +55,7 @@ public interface HorseService {
    * @return the horse with ID {@code id}
    * @throws NotFoundException if the horse with the given ID does not exist in the persistent data store
    */
-  HorseDetailDto getById(long id) throws NotFoundException;
+  HorseChildDetailDto getById(long id) throws NotFoundException;
 
   /**
    * Deletes the horse with given ID.

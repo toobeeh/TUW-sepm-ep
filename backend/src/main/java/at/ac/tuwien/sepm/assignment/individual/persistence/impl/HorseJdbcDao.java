@@ -80,7 +80,7 @@ public class HorseJdbcDao implements HorseDao {
     int updated = jdbcTemplate.update(SQL_DELETE, id);
 
     if (updated == 0) {
-      throw new NotFoundException("Could not update horse with ID " + id + ", because it does not exist");
+      throw new NotFoundException("Could not delete horse with ID " + id + ", because it does not exist");
     }
   }
 
@@ -157,6 +157,8 @@ public class HorseJdbcDao implements HorseDao {
         .setDateOfBirth(result.getDate("date_of_birth").toLocalDate())
         .setSex(Sex.valueOf(result.getString("sex")))
         .setOwnerId(result.getObject("owner_id", Long.class))
+        .setFatherId(result.getObject("father_id", Long.class))
+        .setMotherId(result.getObject("mother_id", Long.class))
         ;
   }
 }

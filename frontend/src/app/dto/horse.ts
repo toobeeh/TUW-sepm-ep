@@ -8,8 +8,9 @@ export interface Horse {
   dateOfBirth: Date;
   sex: Sex;
   owner?: Owner;
+  mother?: Horse;
+  father?: Horse;
 }
-
 
 export interface HorseSearch {
   name?: string;

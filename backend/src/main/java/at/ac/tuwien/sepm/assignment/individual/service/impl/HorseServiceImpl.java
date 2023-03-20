@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.service.impl;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
@@ -60,33 +61,54 @@ public class HorseServiceImpl implements HorseService {
 
 
   @Override
-  public HorseDetailDto update(HorseDetailDto horse) throws NotFoundException, ValidationException, ConflictException {
+  public HorseChildDetailDto update(HorseChildDetailDto horse) throws NotFoundException, ValidationException, ConflictException {
     LOG.trace("update({})", horse);
-    validator.validateForUpdate(horse);
-    var updatedHorse = dao.update(horse);
-    return mapper.entityToDetailDto(
+
+    // get id from parents and fetch stored entity for validation
+    var simpleHorse = horse.withoutParents();
+    var father = horse.father() == null ? null : dao.getById(horse.father().id());
+    var mother = horse.mother() == null ? null : dao.getById(horse.mother().id());
+    validator.validateForUpdate(simpleHorse, father, mother);
+    var updatedHorse = dao.update(simpleHorse);
+
+    return mapper.entityToChildDetailDto(
         updatedHorse,
-        ownerMapForSingleId(updatedHorse.getOwnerId()));
+        ownerMapForSingleId(updatedHorse.getOwnerId()),
+        father,
+        mother);
   }
 
   @Override
-  public HorseDetailDto create(HorseCreateDto horse) throws ValidationException, ConflictException {
+  public HorseChildDetailDto create(HorseCreateDto horse) throws ValidationException, ConflictException, NotFoundException {
     LOG.trace("create({})", horse);
-    validator.validateForInsert(horse);
+
+    var father = horse.fatherId() == null ? null : dao.getById(horse.fatherId());
+    var mother = horse.motherId() == null ? null : dao.getById(horse.motherId());
+    validator.validateForInsert(horse, father, mother);
+
     var createdHorse = dao.create(horse);
-    return mapper.entityToDetailDto(
+
+    return mapper.entityToChildDetailDto(
         createdHorse,
-        ownerMapForSingleId(createdHorse.getOwnerId())
+        ownerMapForSingleId(createdHorse.getOwnerId()),
+        father,
+        mother
     );
   }
 
   @Override
-  public HorseDetailDto getById(long id) throws NotFoundException {
+  public HorseChildDetailDto getById(long id) throws NotFoundException {
     LOG.trace("details({})", id);
+
     Horse horse = dao.getById(id);
-    return mapper.entityToDetailDto(
+    var father = horse.getFatherId() == null ? null : dao.getById(horse.getFatherId());
+    var mother = horse.getMotherId() == null ? null : dao.getById(horse.getMotherId());
+
+    return mapper.entityToChildDetailDto(
         horse,
-        ownerMapForSingleId(horse.getOwnerId()));
+        ownerMapForSingleId(horse.getOwnerId()),
+        father,
+        mother);
   }
 
   @Override

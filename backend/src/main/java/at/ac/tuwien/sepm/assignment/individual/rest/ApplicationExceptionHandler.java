@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.rest;
 
+import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 
@@ -31,5 +32,13 @@ public class ApplicationExceptionHandler {
   public NotFoundErrorRestDto handleValidationException(NotFoundException e) {
     LOG.warn("Terminating request processing with status 404 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
     return new NotFoundErrorRestDto(e.getMessage());
+  }
+
+  @ExceptionHandler
+  @ResponseStatus(HttpStatus.CONFLICT)
+  @ResponseBody
+  public ConflictErrorRestDto handleValidationException(ConflictException e) {
+    LOG.warn("Terminating request processing with status 409 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
+    return new ConflictErrorRestDto(e.summary(), e.errors());
   }
 }
