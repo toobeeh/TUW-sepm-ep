@@ -3,7 +3,7 @@ import {Component, OnInit} from '@angular/core';
 import {NgForm, NgModel} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
-import {Observable, of} from 'rxjs';
+import {map, Observable, of} from 'rxjs';
 import {Horse} from 'src/app/dto/horse';
 import {Owner} from 'src/app/dto/owner';
 import {Sex} from 'src/app/dto/sex';
@@ -85,6 +85,10 @@ export class HorseCreateEditComponent implements OnInit {
     ? of([])
     : this.ownerService.searchByName(input, 5);
 
+  parentSuggestions = (input: string) => (input === '')
+    ? of([])
+    : this.service.getAll().pipe(map(horses => horses.filter(horse => horse.name.indexOf(input) === 0).slice(0,5)));
+
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.mode = data.mode;
@@ -124,6 +128,12 @@ export class HorseCreateEditComponent implements OnInit {
       : `${owner.firstName} ${owner.lastName}`;
   }
 
+  public formatParentName(parent: Horse | null | undefined): string {
+    return (parent == null)
+      ? ''
+      : parent.name;
+  }
+
 
   public onSubmit(form: NgForm): void {
     console.log('is form valid?', form.valid, this.horse);
@@ -136,7 +146,7 @@ export class HorseCreateEditComponent implements OnInit {
         case HorseCreateEditMode.create:
           observable = this.service.create(this.horse);
           break;
-        case HorseCreateEditMode.create:
+        case HorseCreateEditMode.edit:
           observable = this.service.update(this.horse);
           break;
         default:
@@ -152,6 +162,9 @@ export class HorseCreateEditComponent implements OnInit {
           let message: string;
           switch (response.status) {
             case 422:
+              message = response.error.errors.join(', ');
+              break;
+            case 409:
               message = response.error.errors.join(', ');
               break;
             default:
