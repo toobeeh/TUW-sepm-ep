@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import {Component, OnInit} from '@angular/core';
 import {ToastrService} from 'ngx-toastr';
 import {HorseService} from 'src/app/service/horse.service';
@@ -48,6 +49,28 @@ export class HorseComponent implements OnInit {
 
   dateOfBirthAsLocaleDate(horse: Horse): string {
     return new Date(horse.dateOfBirth).toLocaleDateString();
+  }
+
+  public delete(id: number, horse: Horse): void {
+    this.service.delete(id).subscribe({
+      next: data => {
+        this.notification.success(`Horse ${horse.name} successfully deleted.`);
+        this.reloadHorses();
+      },
+      error: (response: HttpErrorResponse) => {
+        let message: string;
+        switch (response.status) {
+          case 404:
+            message = 'Horse does not exist';
+            break;
+          default:
+            message = 'Something went wrong';
+            break;
+        }
+        this.notification.error(`Horse ${horse.name} could not be deleted: \n${message}`);
+        console.error('Error deleting horse', response);
+      }
+    });
   }
 
 }

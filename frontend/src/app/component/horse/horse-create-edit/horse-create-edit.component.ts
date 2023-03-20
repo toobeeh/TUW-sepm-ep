@@ -187,7 +187,6 @@ export class HorseCreateEditComponent implements OnInit {
   }
 
   public onDelete(): void {
-    let observable: Observable<Horse>;
     if(this.mode === HorseCreateEditMode.edit && this.horse.id){
       this.service.delete(this.horse.id).subscribe({
         next: data => {
