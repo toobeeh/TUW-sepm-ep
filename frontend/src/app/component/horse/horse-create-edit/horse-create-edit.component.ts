@@ -28,7 +28,7 @@ export class HorseCreateEditComponent implements OnInit {
     name: '',
     description: '',
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-nocheck
+    // @ts-ignore to use default date as empty for invalid form
     dateOfBirth: null,
     sex: Sex.female,
   };
@@ -122,9 +122,17 @@ export class HorseCreateEditComponent implements OnInit {
           this.router.navigate(['/horses']);
         },
         error: (response: HttpErrorResponse) => {
-          this.notification.error(`Horse ${this.horse.name} could not be created: ${response.message}.`);
-          console.error('Error creating horse', response.message);
-          // TODO show an error message to the user. Include and sensibly present the info from the backend!
+          let message: string;
+          switch (response.status) {
+            case 422:
+              message = response.error.errors.join(', ');
+              break;
+            default:
+              message = 'Something went wrong';
+              break;
+          }
+          this.notification.error(`Horse ${this.horse.name} could not be created: \n${message}`);
+          console.error('Error creating horse', response);
         }
       });
     }
