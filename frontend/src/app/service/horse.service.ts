@@ -34,7 +34,6 @@ export class HorseService {
     return this.http.get<Horse>(`${baseUri}/${id}`);
   }
 
-
   /**
    * Create a new horse in the system.
    *
@@ -48,7 +47,6 @@ export class HorseService {
     );
   }
 
-
   /**
    * Edit a horse in the system.
    *
@@ -59,6 +57,18 @@ export class HorseService {
     return this.http.put<Horse>(
       `${baseUri}/${horse.id}`,
       horse
+    );
+  }
+
+  /**
+   * Delete a horse in the system.
+   *
+   * @param horse the id of the horse whih should be deleted
+   * @return an Observable for the delete completion
+   */
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${baseUri}/${id}`
     );
   }
 

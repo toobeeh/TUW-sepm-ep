@@ -165,4 +165,31 @@ export class HorseCreateEditComponent implements OnInit {
     }
   }
 
+  public onDelete(): void {
+    let observable: Observable<Horse>;
+    if(this.mode === HorseCreateEditMode.edit && this.horse.id){
+      this.service.delete(this.horse.id).subscribe({
+        next: data => {
+          this.notification.success(`Horse ${this.horse.name} successfully deleted.`);
+          this.router.navigate(['/horses']);
+        },
+        error: (response: HttpErrorResponse) => {
+          let message: string;
+          switch (response.status) {
+            case 404:
+              message = 'Horse does not exist';
+              break;
+            default:
+              message = 'Something went wrong';
+              break;
+          }
+          this.notification.error(`Horse ${this.horse.name} could not be deleted: \n${message}`);
+          console.error('Error deleting horse', response, this.modeIsCreate);
+        }
+      });
+    }
+    else {
+      console.error('tried to remove horse in create mode or without id set');
+    }
+  }
 }
