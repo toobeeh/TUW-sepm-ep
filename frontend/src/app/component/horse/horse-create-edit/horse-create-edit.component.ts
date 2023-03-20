@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import {Component, OnInit} from '@angular/core';
 import {NgForm, NgModel} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -26,7 +27,9 @@ export class HorseCreateEditComponent implements OnInit {
   horse: Horse = {
     name: '',
     description: '',
-    dateOfBirth: new Date(),
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-nocheck
+    dateOfBirth: null,
     sex: Sex.female,
   };
 
@@ -118,8 +121,9 @@ export class HorseCreateEditComponent implements OnInit {
           this.notification.success(`Horse ${this.horse.name} successfully ${this.modeActionFinished}.`);
           this.router.navigate(['/horses']);
         },
-        error: error => {
-          console.error('Error creating horse', error);
+        error: (response: HttpErrorResponse) => {
+          this.notification.error(`Horse ${this.horse.name} could not be created: ${response.message}.`);
+          console.error('Error creating horse', response.message);
           // TODO show an error message to the user. Include and sensibly present the info from the backend!
         }
       });

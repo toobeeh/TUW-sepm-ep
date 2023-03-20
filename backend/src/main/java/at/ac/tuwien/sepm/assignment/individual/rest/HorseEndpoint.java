@@ -1,19 +1,24 @@
 package at.ac.tuwien.sepm.assignment.individual.rest;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
+import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepm.assignment.individual.service.HorseService;
+
 import java.lang.invoke.MethodHandles;
 import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,6 +69,14 @@ public class HorseEndpoint {
       logClientError(status, "Horse to update not found", e);
       throw new ResponseStatusException(status, e.getMessage(), e);
     }
+  }
+
+
+  @PostMapping()
+  public HorseDetailDto create(@RequestBody HorseCreateDto toCreate) throws ConflictException, ValidationException {
+    LOG.info("POST " + BASE_PATH + "/{}", toCreate);
+    LOG.debug("Body of request:\n{}", toCreate);
+    return service.create(toCreate);
   }
 
 

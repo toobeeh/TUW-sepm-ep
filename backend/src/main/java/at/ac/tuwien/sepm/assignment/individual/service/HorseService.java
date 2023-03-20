@@ -1,10 +1,12 @@
 package at.ac.tuwien.sepm.assignment.individual.service;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
+
 import java.util.stream.Stream;
 
 /**
@@ -25,13 +27,24 @@ public interface HorseService {
    * in the persistent data store.
    *
    * @param horse the horse to update
-   * @return he updated horse
-   * @throws NotFoundException if the horse with given ID does not exist in the persistent data store
+   * @return the updated horse
+   * @throws NotFoundException   if the horse with given ID does not exist in the persistent data store
    * @throws ValidationException if the update data given for the horse is in itself incorrect (description too long, no name, …)
-   * @throws ConflictException if the update data given for the horse is in conflict the data currently in the system (owner does not exist, …)
+   * @throws ConflictException   if the update data given for the horse is in conflict the data currently in the system (owner does not exist, …)
    */
   HorseDetailDto update(HorseDetailDto horse) throws NotFoundException, ValidationException, ConflictException;
 
+
+  /**
+   * Creates the horse with the data given in {@code horse}
+   * in the persistent data store.
+   *
+   * @param horse the horse to create
+   * @return the created horse
+   * @throws ValidationException if the creation data given for the horse is in itself incorrect (description too long, no name, …)
+   * @throws ConflictException   if the update data given for the horse is in conflict the data currently in the system (owner does not exist, …)
+   */
+  HorseDetailDto create(HorseCreateDto horse) throws ValidationException, ConflictException;
 
   /**
    * Get the horse with given ID, with more detail information.

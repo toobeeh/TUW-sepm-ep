@@ -34,3 +34,4 @@ build/
 
 ### Runtime artifacts ###
 /log/
+*.db
