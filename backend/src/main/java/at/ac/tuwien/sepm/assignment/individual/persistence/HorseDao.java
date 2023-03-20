@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.persistence;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
@@ -29,7 +30,7 @@ public interface HorseDao {
    * @return the updated horse
    * @throws NotFoundException if the Horse with the given ID does not exist in the persistent data store
    */
-  Horse update(HorseDetailDto horse) throws NotFoundException;
+  Horse update(HorseChildDetailDto horse) throws NotFoundException;
 
 
   /**

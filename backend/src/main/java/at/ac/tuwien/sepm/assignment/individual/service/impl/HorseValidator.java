@@ -60,28 +60,28 @@ public class HorseValidator {
     }
   }
 
-  private void validateParents(List<String> validationErrors, Horse father, Horse mother, LocalDate childBirth, Long childId) {
-    if (mother != null && mother.getId() == childId) {
+  private void validateParents(List<String> validationErrors, HorseDetailDto father, HorseDetailDto mother, LocalDate childBirth, Long childId) {
+    if (mother != null && mother.id() == childId) {
       validationErrors.add("Mother horse is the same as child");
     }
-    if (father != null && father.getId() == childId) {
+    if (father != null && father.id() == childId) {
       validationErrors.add("Father horse is the same as child");
     }
-    if (mother != null && mother.getSex() != Sex.FEMALE) {
+    if (mother != null && mother.sex() != Sex.FEMALE) {
       validationErrors.add("Mother horse is not female");
     }
-    if (father != null && father.getSex() != Sex.MALE) {
+    if (father != null && father.sex() != Sex.MALE) {
       validationErrors.add("Father horse is not male");
     }
-    if (mother != null && mother.getDateOfBirth().isAfter(childBirth)) {
+    if (mother != null && mother.dateOfBirth().isAfter(childBirth)) {
       validationErrors.add("Mother horse is younger than child");
     }
-    if (father != null && father.getDateOfBirth().isAfter(childBirth)) {
+    if (father != null && father.dateOfBirth().isAfter(childBirth)) {
       validationErrors.add("Father horse is younger than child");
     }
   }
 
-  public void validateForUpdate(HorseDetailDto horse, Horse father, Horse mother) throws ValidationException, ConflictException {
+  public void validateForUpdate(HorseDetailDto horse, HorseDetailDto father, HorseDetailDto mother) throws ValidationException, ConflictException {
     LOG.trace("validateForUpdate({})", horse);
     List<String> validationErrors = new ArrayList<>();
     List<String> validationConflicts = new ArrayList<>();
@@ -102,7 +102,7 @@ public class HorseValidator {
     }
   }
 
-  public void validateForInsert(HorseCreateDto horse, Horse father, Horse mother) throws ValidationException, ConflictException {
+  public void validateForInsert(HorseCreateDto horse, HorseDetailDto father, HorseDetailDto mother) throws ValidationException, ConflictException {
     LOG.trace("validateForInsert({})", horse);
     List<String> validationErrors = new ArrayList<>();
     List<String> validationConflicts = new ArrayList<>();

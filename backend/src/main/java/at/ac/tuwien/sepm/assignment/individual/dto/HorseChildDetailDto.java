@@ -22,8 +22,8 @@ public record HorseChildDetailDto(
         dateOfBirth,
         sex,
         owner,
-        mother,
-        father);
+        father,
+        mother);
   }
 
   public HorseDetailDto withoutParents() {
@@ -41,5 +41,17 @@ public record HorseChildDetailDto(
     return owner == null
         ? null
         : owner.id();
+  }
+
+  public Long fatherId() {
+    return father == null
+        ? null
+        : father.id();
+  }
+
+  public Long motherId() {
+    return mother == null
+        ? null
+        : mother.id();
   }
 }

@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.assignment.individual.persistence.impl;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
@@ -39,10 +40,12 @@ public class HorseJdbcDao implements HorseDao {
       + "  , date_of_birth = ?"
       + "  , sex = ?"
       + "  , owner_id = ?"
+      + "  , father_id = ?"
+      + "  , mother_id = ?"
       + " WHERE id = ?";
   private static final String SQL_CREATE = "INSERT INTO " + TABLE_NAME
-      + "(name, description, date_of_birth, sex, owner_id) " +
-      "VALUES(?, ? ,?, ?, ?)";
+      + "(name, description, date_of_birth, sex, owner_id, father_id, mother_id) " +
+      "VALUES(?, ? ,?, ?, ?, ?, ?)";
 
   private final JdbcTemplate jdbcTemplate;
 
@@ -86,7 +89,7 @@ public class HorseJdbcDao implements HorseDao {
 
 
   @Override
-  public Horse update(HorseDetailDto horse) throws NotFoundException {
+  public Horse update(HorseChildDetailDto horse) throws NotFoundException {
     LOG.trace("update({})", horse);
     int updated = jdbcTemplate.update(SQL_UPDATE,
         horse.name(),
@@ -94,6 +97,8 @@ public class HorseJdbcDao implements HorseDao {
         horse.dateOfBirth(),
         horse.sex().toString(),
         horse.ownerId(),
+        horse.fatherId(),
+        horse.motherId(),
         horse.id());
     if (updated == 0) {
       throw new NotFoundException("Could not update horse with ID " + horse.id() + ", because it does not exist");
@@ -121,13 +126,9 @@ public class HorseJdbcDao implements HorseDao {
       stmt.setString(2, horse.description());
       stmt.setDate(3, Date.valueOf(horse.dateOfBirth()));
       stmt.setString(4, horse.sex().name());
-
-      var ownerId = horse.ownerId();
-      if (ownerId == null) {
-        stmt.setNull(5, Types.BIGINT);
-      } else {
-        stmt.setLong(5, ownerId);
-      }
+      stmt.setObject(5, horse.ownerId());
+      stmt.setObject(6, horse.fatherId());
+      stmt.setObject(7, horse.motherId());
 
       return stmt;
     }, keyHolder);

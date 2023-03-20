@@ -64,12 +64,14 @@ public class HorseServiceImpl implements HorseService {
   public HorseChildDetailDto update(HorseChildDetailDto horse) throws NotFoundException, ValidationException, ConflictException {
     LOG.trace("update({})", horse);
 
-    // get id from parents and fetch stored entity for validation
+    // get IDs of parents, fetch entity from db and convert to DTO for validator
     var simpleHorse = horse.withoutParents();
     var father = horse.father() == null ? null : dao.getById(horse.father().id());
     var mother = horse.mother() == null ? null : dao.getById(horse.mother().id());
-    validator.validateForUpdate(simpleHorse, father, mother);
-    var updatedHorse = dao.update(simpleHorse);
+    var fatherDto = father == null ? null : mapper.entityToDetailDto(father, ownerMapForSingleId(father.getOwnerId()));
+    var motherDto = mother == null ? null : mapper.entityToDetailDto(mother, ownerMapForSingleId(mother.getOwnerId()));
+    validator.validateForUpdate(simpleHorse, fatherDto, motherDto);
+    var updatedHorse = dao.update(horse);
 
     return mapper.entityToChildDetailDto(
         updatedHorse,
@@ -82,9 +84,12 @@ public class HorseServiceImpl implements HorseService {
   public HorseChildDetailDto create(HorseCreateDto horse) throws ValidationException, ConflictException, NotFoundException {
     LOG.trace("create({})", horse);
 
+    // get IDs of parents, fetch entity from db and convert to DTO for validator
     var father = horse.fatherId() == null ? null : dao.getById(horse.fatherId());
     var mother = horse.motherId() == null ? null : dao.getById(horse.motherId());
-    validator.validateForInsert(horse, father, mother);
+    var fatherDto = father == null ? null : mapper.entityToDetailDto(father, ownerMapForSingleId(father.getOwnerId()));
+    var motherDto = mother == null ? null : mapper.entityToDetailDto(mother, ownerMapForSingleId(mother.getOwnerId()));
+    validator.validateForInsert(horse, fatherDto, motherDto);
 
     var createdHorse = dao.create(horse);
 
