@@ -152,7 +152,8 @@ public class HorseJdbcDao implements HorseDao {
         .setDateOfBirth(horse.dateOfBirth())
         .setSex(horse.sex())
         .setOwnerId(horse.ownerId())
-        ;
+        .setFatherId(horse.fatherId())
+        .setMotherId(horse.motherId());
   }
 
 
@@ -187,7 +188,8 @@ public class HorseJdbcDao implements HorseDao {
         .setDateOfBirth(horse.dateOfBirth())
         .setSex(horse.sex())
         .setOwnerId(horse.ownerId())
-        ;
+        .setFatherId(horse.fatherId())
+        .setMotherId(horse.motherId());
   }
 
 
