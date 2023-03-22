@@ -40,7 +40,7 @@ public class HorseEndpoint {
   }
 
   @GetMapping
-  public Stream<HorseListDto> searchHorses(HorseSearchDto searchParameters) {
+  public Stream<HorseListDto> search(HorseSearchDto searchParameters) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("request parameters: {}", searchParameters);
     return service.searchHorses(searchParameters);

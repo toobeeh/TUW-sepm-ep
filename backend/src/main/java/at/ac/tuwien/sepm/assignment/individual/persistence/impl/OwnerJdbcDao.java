@@ -2,11 +2,14 @@ package at.ac.tuwien.sepm.assignment.individual.persistence.impl;
 
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerSearchDto;
+import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.entity.Owner;
 import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.persistence.OwnerDao;
+
 import java.lang.invoke.MethodHandles;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,9 +18,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
@@ -28,9 +34,6 @@ public class OwnerJdbcDao implements OwnerDao {
   private static final String TABLE_NAME = "owner";
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
   private static final String SQL_SELECT_ALL = "SELECT * FROM " + TABLE_NAME + " WHERE id IN (:ids)";
-  private static final String SQL_SELECT_SEARCH = "SELECT * FROM " + TABLE_NAME
-      + " WHERE UPPER(first_name||' '||last_name) like UPPER('%'||COALESCE(?, '')||'%')";
-  private static final String SQL_SELECT_SEARCH_LIMIT_CLAUSE = " LIMIT ?";
   private static final String SQL_CREATE = "INSERT INTO " + TABLE_NAME + " (first_name, last_name, email) VALUES (?, ?, ?)";
 
   private final JdbcTemplate jdbcTemplate;
@@ -93,15 +96,30 @@ public class OwnerJdbcDao implements OwnerDao {
   @Override
   public Collection<Owner> search(OwnerSearchDto searchParameters) {
     LOG.trace("search({})", searchParameters);
-    var query = SQL_SELECT_SEARCH;
-    var params = new ArrayList<>();
-    params.add(searchParameters.name());
-    var maxAmount = searchParameters.maxAmount();
-    if (maxAmount != null) {
-      query += SQL_SELECT_SEARCH_LIMIT_CLAUSE;
-      params.add(maxAmount);
+    List<Owner> owners;
+
+    Function<String, String> like = str -> "%" + str.toLowerCase() + "%";
+
+    var sqlParams = new MapSqlParameterSource();
+    var namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+    String sql = "SELECT * FROM " + TABLE_NAME + " WHERE 1=1";
+
+    if (searchParameters.name() != null) {
+      sql += " AND LOWER(first_name||' '||last_name) LIKE :name";
+      sqlParams.addValue("name", like.apply(searchParameters.name()));
     }
-    return jdbcTemplate.query(query, this::mapRow, params.toArray());
+    if (searchParameters.maxAmount() != null) {
+      sql += " LIMIT :limit";
+      sqlParams.addValue("limit", searchParameters.maxAmount());
+    }
+
+    owners = namedTemplate.query(
+        sql,
+        sqlParams,
+        this::mapRow
+    );
+
+    return owners;
   }
 
   private Owner mapRow(ResultSet resultSet, int i) throws SQLException {
