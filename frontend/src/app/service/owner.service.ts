@@ -7,22 +7,21 @@ import { Owner } from '../dto/owner';
 const baseUri = environment.backendUrl + '/owners';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OwnerService {
-
-  constructor(
-    private http: HttpClient,
-  ) { }
+  constructor(private http: HttpClient) {}
 
   public searchByName(name: string, limitTo: number): Observable<Owner[]> {
-    const params = new HttpParams()
-      .set('name', name)
-      .set('maxAmount', limitTo);
+    const params = new HttpParams().set('name', name).set('maxAmount', limitTo);
     return this.http.get<Owner[]>(baseUri, { params });
   }
 
   public getAll(): Observable<Owner[]> {
     return this.http.get<Owner[]>(baseUri);
+  }
+
+  public create(owner: Owner): Observable<Owner> {
+    return this.http.post<Owner>(baseUri, owner);
   }
 }
