@@ -1,40 +1,55 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { NgForm } from '@angular/forms';
-import {ToastrService} from 'ngx-toastr';
-import { debounce, debounceTime, Subject, Subscription } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { debounce, debounceTime, of, Subject, Subscription } from 'rxjs';
 import { Sex } from 'src/app/dto/sex';
-import {HorseService} from 'src/app/service/horse.service';
-import {Horse, HorseSearch} from '../../dto/horse';
-import {Owner} from '../../dto/owner';
+import { HorseService } from 'src/app/service/horse.service';
+import { OwnerService } from 'src/app/service/owner.service';
+import { Horse, HorseSearch } from '../../dto/horse';
+import { Owner } from '../../dto/owner';
 
 @Component({
   selector: 'app-horse',
   templateUrl: './horse.component.html',
-  styleUrls: ['./horse.component.scss']
+  styleUrls: ['./horse.component.scss'],
 })
 export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
-
-  @ViewChild('form', {static: true}) ngForm?: NgForm;
+  @ViewChild('form', { static: true }) ngForm?: NgForm;
 
   horses: Horse[] = [];
   bannerError: string | null = null;
   formChanged?: Subscription;
-  searchData: HorseSearch = { };
+  searchData: HorseSearch = {};
 
   constructor(
     private service: HorseService,
     private notification: ToastrService,
-  ) { }
+    private ownerService: OwnerService
+  ) {}
 
   private get cleanSearchData() {
-    const data = {... this.searchData};
+    const data = { ...this.searchData };
 
     // remove empty props
-    if(data.description?.length === 0) { delete data.description; }
-    if(data.name?.length === 0) { delete data.name; }
-    if(data.owner?.length === 0) { delete data.owner; }
-    if(data.sex?.length === 0) { delete data.sex; }
+    if (data.description?.length === 0) {
+      delete data.description;
+    }
+    if (data.name?.length === 0) {
+      delete data.name;
+    }
+    if (data.owner?.length === 0) {
+      delete data.owner;
+    }
+    if (data.sex?.length === 0) {
+      delete data.sex;
+    }
     return data;
   }
 
@@ -43,11 +58,9 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.formChanged = this.ngForm?.valueChanges?.pipe(
-      debounceTime(250)
-    ).subscribe(
-      this.reloadHorses.bind(this)
-    );
+    this.formChanged = this.ngForm?.valueChanges
+      ?.pipe(debounceTime(250))
+      .subscribe(this.reloadHorses.bind(this));
   }
 
   ngOnDestroy(): void {
@@ -55,26 +68,25 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   reloadHorses() {
-    this.service.searchAll(this.cleanSearchData)
-      .subscribe({
-        next: data => {
-          this.horses = data;
-        },
-        error: error => {
-          console.error('Error fetching horses', error);
-          this.bannerError = 'Could not fetch horses: ' + error.message;
-          const errorMessage = error.status === 0
-            ? 'Is the backend up?'
-            : error.message.message;
-          this.notification.error(errorMessage, 'Could Not Fetch Horses');
-        }
-      });
+    this.service.searchAll(this.cleanSearchData).subscribe({
+      next: (data) => {
+        this.horses = data;
+      },
+      error: (error) => {
+        console.error('Error fetching horses', error);
+        this.bannerError = 'Could not fetch horses: ' + error.message;
+        const errorMessage =
+          error.status === 0 ? 'Is the backend up?' : error.message.message;
+        this.notification.error(errorMessage, 'Could Not Fetch Horses');
+      },
+    });
   }
 
-  ownerName(owner: Owner | null): string {
-    return owner
-      ? `${owner.firstName} ${owner.lastName}`
-      : '';
+  ownerSuggestions = (input: string) =>
+    input === '' ? of([]) : this.ownerService.searchByName(input, 5);
+
+  public formatOwnerName(owner: Owner | null | undefined): string {
+    return owner == null ? '' : `${owner.firstName} ${owner.lastName}`;
   }
 
   dateOfBirthAsLocaleDate(horse: Horse): string {
@@ -83,7 +95,7 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public delete(id: number, horse: Horse): void {
     this.service.delete(id).subscribe({
-      next: data => {
+      next: (data) => {
         this.notification.success(`Horse ${horse.name} successfully deleted.`);
         this.reloadHorses();
       },
@@ -97,10 +109,11 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
             message = 'Something went wrong';
             break;
         }
-        this.notification.error(`Horse ${horse.name} could not be deleted: \n${message}`);
+        this.notification.error(
+          `Horse ${horse.name} could not be deleted: \n${message}`
+        );
         console.error('Error deleting horse', response);
-      }
+      },
     });
   }
-
 }
