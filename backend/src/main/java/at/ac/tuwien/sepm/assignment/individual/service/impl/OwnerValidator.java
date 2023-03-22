@@ -49,11 +49,11 @@ public class OwnerValidator {
         validationErrors.add("Owner email too long: longer than 255 characters");
       }
 
-      String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+      String emailRegex = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
       Pattern pattern = Pattern.compile(emailRegex);
       Matcher matcher = pattern.matcher(email);
 
-      if (matcher.matches()) {
+      if (!matcher.matches()) {
         validationErrors.add("Owner email is not in a valid format");
       }
     } else {
@@ -69,7 +69,7 @@ public class OwnerValidator {
     validateName(validationErrors, owner.lastName(), "lastname");
     validateEmail(validationErrors, owner.email());
     if (!validationErrors.isEmpty()) {
-      throw new ValidationException("Validation of horse for create failed", validationErrors);
+      throw new ValidationException("Validation of owner for create failed", validationErrors);
     }
   }
 
