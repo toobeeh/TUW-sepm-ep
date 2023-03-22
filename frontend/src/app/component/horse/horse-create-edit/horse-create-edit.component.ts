@@ -1,29 +1,27 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
-import {NgForm, NgModel} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ToastrService} from 'ngx-toastr';
-import {map, Observable, of} from 'rxjs';
-import {Horse} from 'src/app/dto/horse';
-import {Owner} from 'src/app/dto/owner';
-import {Sex} from 'src/app/dto/sex';
-import {HorseService} from 'src/app/service/horse.service';
-import {OwnerService} from 'src/app/service/owner.service';
-
+import { Component, OnInit } from '@angular/core';
+import { NgForm, NgModel } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { map, Observable, of } from 'rxjs';
+import { Horse } from 'src/app/dto/horse';
+import { Owner } from 'src/app/dto/owner';
+import { Sex } from 'src/app/dto/sex';
+import { HorseService } from 'src/app/service/horse.service';
+import { OwnerService } from 'src/app/service/owner.service';
 
 export enum HorseCreateEditMode {
   create,
   edit,
-  view
-};
+  view,
+}
 
 @Component({
   selector: 'app-horse-create-edit',
   templateUrl: './horse-create-edit.component.html',
-  styleUrls: ['./horse-create-edit.component.scss']
+  styleUrls: ['./horse-create-edit.component.scss'],
 })
 export class HorseCreateEditComponent implements OnInit {
-
   public readonly modes = HorseCreateEditMode;
   mode: HorseCreateEditMode = HorseCreateEditMode.create;
   horse: Horse = {
@@ -35,14 +33,16 @@ export class HorseCreateEditComponent implements OnInit {
     sex: Sex.female,
   };
 
-
   constructor(
     private service: HorseService,
     private ownerService: OwnerService,
     private router: Router,
     private route: ActivatedRoute,
-    private notification: ToastrService,
+    private notification: ToastrService
   ) {
+    this.route.paramMap.subscribe(() => {
+      this.ngOnInit();
+    });
   }
 
   public get heading(): string {
@@ -77,7 +77,6 @@ export class HorseCreateEditComponent implements OnInit {
     return this.mode === HorseCreateEditMode.view;
   }
 
-
   private get modeActionFinished(): string {
     switch (this.mode) {
       case HorseCreateEditMode.create:
@@ -89,32 +88,29 @@ export class HorseCreateEditComponent implements OnInit {
     }
   }
 
-  ownerSuggestions = (input: string) => (input === '')
-    ? of([])
-    : this.ownerService.searchByName(input, 5);
+  ownerSuggestions = (input: string) =>
+    input === '' ? of([]) : this.ownerService.searchByName(input, 5);
 
-  parentSuggestions = (input: string) => (input === '')
-    ? of([])
-    : this.service.searchAll().pipe(map(horses => horses.filter(horse => horse.name.indexOf(input) === 0).slice(0,5)));
+  parentSuggestions = (input: string) =>
+    input === '' ? of([]) : this.service.searchAll({ name: input });
 
   ngOnInit(): void {
-    this.route.data.subscribe(data => {
+    this.route.data.subscribe((data) => {
       this.mode = data.mode;
-      if(data.mode !== HorseCreateEditMode.create){
+      if (data.mode !== HorseCreateEditMode.create) {
         const id = Number(this.route.snapshot.paramMap.get('id'));
-        if(Number.isNaN(id)){
+        if (Number.isNaN(id)) {
           this.notification.error('Could not load horse to edit');
           this.router.navigate(['/horses']);
-        }
-        else {
+        } else {
           this.service.get(id).subscribe({
-            next: horse => {
+            next: (horse) => {
               this.horse = horse;
             },
-            error: response => {
+            error: (response) => {
               this.notification.error('Could not load horse to edit');
               this.router.navigate(['/horses']);
-            }
+            },
           });
         }
       }
@@ -131,17 +127,12 @@ export class HorseCreateEditComponent implements OnInit {
   }
 
   public formatOwnerName(owner: Owner | null | undefined): string {
-    return (owner == null)
-      ? ''
-      : `${owner.firstName} ${owner.lastName}`;
+    return owner == null ? '' : `${owner.firstName} ${owner.lastName}`;
   }
 
   public formatParentName(parent: Horse | null | undefined): string {
-    return (parent == null)
-      ? ''
-      : parent.name;
+    return parent == null ? '' : parent.name;
   }
-
 
   public onSubmit(form: NgForm): void {
     console.log('is form valid?', form.valid, this.horse);
@@ -162,8 +153,10 @@ export class HorseCreateEditComponent implements OnInit {
           return;
       }
       observable.subscribe({
-        next: data => {
-          this.notification.success(`Horse ${this.horse.name} successfully ${this.modeActionFinished}.`);
+        next: (data) => {
+          this.notification.success(
+            `Horse ${this.horse.name} successfully ${this.modeActionFinished}.`
+          );
           this.router.navigate(['/horses']);
         },
         error: (response: HttpErrorResponse) => {
@@ -179,18 +172,26 @@ export class HorseCreateEditComponent implements OnInit {
               message = 'Something went wrong';
               break;
           }
-          this.notification.error(`Horse ${this.horse.name} could not be ${this.modeActionFinished}: \n${message}`);
-          console.error('Error creating/updating horse', response, this.modeIsCreate);
-        }
+          this.notification.error(
+            `Horse ${this.horse.name} could not be ${this.modeActionFinished}: \n${message}`
+          );
+          console.error(
+            'Error creating/updating horse',
+            response,
+            this.modeIsCreate
+          );
+        },
       });
     }
   }
 
   public onDelete(): void {
-    if(this.mode === HorseCreateEditMode.edit && this.horse.id){
+    if (this.mode === HorseCreateEditMode.edit && this.horse.id) {
       this.service.delete(this.horse.id).subscribe({
-        next: data => {
-          this.notification.success(`Horse ${this.horse.name} successfully deleted.`);
+        next: (data) => {
+          this.notification.success(
+            `Horse ${this.horse.name} successfully deleted.`
+          );
           this.router.navigate(['/horses']);
         },
         error: (response: HttpErrorResponse) => {
@@ -203,12 +204,13 @@ export class HorseCreateEditComponent implements OnInit {
               message = 'Something went wrong';
               break;
           }
-          this.notification.error(`Horse ${this.horse.name} could not be deleted: \n${message}`);
+          this.notification.error(
+            `Horse ${this.horse.name} could not be deleted: \n${message}`
+          );
           console.error('Error deleting horse', response, this.modeIsCreate);
-        }
+        },
       });
-    }
-    else {
+    } else {
       console.error('tried to remove horse in create mode or without id set');
     }
   }

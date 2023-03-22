@@ -131,7 +131,9 @@
         </label>
         <div class="col-md-10 col-lg-8" [ngSwitch]="mode">
           <ng-container *ngSwitchCase="modes.view">
-            <div class="col-form-label">{{ horse.owner }}</div>
+            <div class="col-form-label">
+              {{ horse.owner?.firstName }} {{ horse.owner?.lastName }}
+            </div>
           </ng-container>
           <ng-container *ngSwitchDefault>
             <app-autocomplete
@@ -163,7 +165,11 @@
         </label>
         <div class="col-md-10 col-lg-8" [ngSwitch]="mode">
           <ng-container *ngSwitchCase="modes.view">
-            <div class="col-form-label">{{ horse.mother?.name }}</div>
+            <a
+              [routerLink]="['../' + horse.mother?.id]"
+              class="col-form-label text-decoration-none d-block"
+              >{{ horse.mother?.name }}</a
+            >
           </ng-container>
           <ng-container *ngSwitchDefault>
             <app-autocomplete
@@ -191,7 +197,11 @@
         </label>
         <div class="col-md-10 col-lg-8" [ngSwitch]="mode">
           <ng-container *ngSwitchCase="modes.view">
-            <div class="col-form-label">{{ horse.father?.name }}</div>
+            <a
+              [routerLink]="['../' + horse.father?.id]"
+              class="col-form-label text-decoration-none d-block"
+              >{{ horse.father?.name }}</a
+            >
           </ng-container>
           <ng-container *ngSwitchDefault>
             <app-autocomplete
