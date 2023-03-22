@@ -82,7 +82,8 @@ public class HorseServiceImpl implements HorseService {
 
     return mapper.entityToChildDetailDto(
         updatedHorse,
-        ownerMapForMultipleId(Arrays.asList(updatedHorse.getOwnerId(), father.getOwnerId(), mother.getOwnerId())),
+        ownerMapForMultipleId(
+            Arrays.asList(updatedHorse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId())),
         father,
         mother);
   }
@@ -102,7 +103,8 @@ public class HorseServiceImpl implements HorseService {
 
     return mapper.entityToChildDetailDto(
         createdHorse,
-        ownerMapForMultipleId(Arrays.asList(createdHorse.getOwnerId(), father.getOwnerId(), mother.getOwnerId())),
+        ownerMapForMultipleId(
+            Arrays.asList(createdHorse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId())),
         father,
         mother
     );
@@ -118,7 +120,8 @@ public class HorseServiceImpl implements HorseService {
 
     return mapper.entityToChildDetailDto(
         horse,
-        ownerMapForMultipleId(Arrays.asList(horse.getOwnerId(), father.getOwnerId(), mother.getOwnerId())),
+        ownerMapForMultipleId(
+            Arrays.asList(horse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId())),
         father,
         mother);
   }
@@ -141,6 +144,7 @@ public class HorseServiceImpl implements HorseService {
   }
 
   private Map<Long, OwnerDto> ownerMapForMultipleId(Collection<Long> ownerIds) {
+    ownerIds = ownerIds.stream().filter(id -> id != null).toList();
     try {
       return ownerIds == null
           ? null
