@@ -14,19 +14,33 @@
   </a>
 </div>
 
-<form class="d-flex flex-row w-auto mb-3" (submit)="reloadHorses()">
+<form
+  #form="ngForm"
+  class="d-flex flex-row w-auto mb-3"
+  (submit)="reloadHorses()"
+>
   <!-- this button is here, just so that simple submitting of this form
        to reload the horses, is possible -->
   <button type="submit" hidden="true">submit</button>
   <div class="flex-grow-2">
     <label for="searchHorseName" class="col-form-label"> Name </label>
-    <input type="text" name="searchHorseName" class="form-control" />
+    <input
+      [(ngModel)]="searchData.name"
+      type="text"
+      name="searchHorseName"
+      class="form-control"
+    />
   </div>
   <div class="flex-grow-1 ms-1">
     <label for="searchHorseDescription" class="col-form-label">
       Description
     </label>
-    <input type="text" name="searchHorseDescription" class="form-control" />
+    <input
+      [(ngModel)]="searchData.description"
+      type="text"
+      name="searchHorseDescription"
+      class="form-control"
+    />
   </div>
   <div class="ms-1">
     <label for="searchHorseDateOfBirth" class="col-form-label">
@@ -36,6 +50,7 @@
          The date format of the plain HTML date input, in browser that support it is, sadly, not changeable in a cross-browser way
       -->
     <input
+      [(ngModel)]="searchData.bornBefore"
       type="date"
       name="searchHorseDateOfBirth"
       pattern="\d{4}-\d{2}-\d{2}"
@@ -45,7 +60,11 @@
   </div>
   <div class="ms-1">
     <label for="searchHorseSex" class="col-form-label"> Sex </label>
-    <select name="searchHorseSex" class="form-select">
+    <select
+      name="searchHorseSex"
+      class="form-select"
+      [(ngModel)]="searchData.sex"
+    >
       <option></option>
       <option value="FEMALE">Female</option>
       <option value="MALE">Male</option>
@@ -54,6 +73,7 @@
   <div class="flex-grow-2 ms-1">
     <label for="searchHorseOwner" class="col-form-label"> Owner </label>
     <app-autocomplete
+      [(ngModel)]="searchData.owner"
       name="searchHorseOwner"
       textInputClass="form-control"
       valueNeedsToMatchSuggestion="false"

@@ -1,8 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { NgForm } from '@angular/forms';
 import {ToastrService} from 'ngx-toastr';
+import { debounce, debounceTime, Subject, Subscription } from 'rxjs';
+import { Sex } from 'src/app/dto/sex';
 import {HorseService} from 'src/app/service/horse.service';
-import {Horse} from '../../dto/horse';
+import {Horse, HorseSearch} from '../../dto/horse';
 import {Owner} from '../../dto/owner';
 
 @Component({
@@ -10,22 +13,49 @@ import {Owner} from '../../dto/owner';
   templateUrl: './horse.component.html',
   styleUrls: ['./horse.component.scss']
 })
-export class HorseComponent implements OnInit {
-  search = false;
+export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('form', {static: true}) ngForm?: NgForm;
+
   horses: Horse[] = [];
   bannerError: string | null = null;
+  formChanged?: Subscription;
+  searchData: HorseSearch = { };
 
   constructor(
     private service: HorseService,
     private notification: ToastrService,
   ) { }
 
+  private get cleanSearchData() {
+    const data = {... this.searchData};
+
+    // remove empty props
+    if(data.description?.length === 0) { delete data.description; }
+    if(data.name?.length === 0) { delete data.name; }
+    if(data.owner?.length === 0) { delete data.owner; }
+    if(data.sex?.length === 0) { delete data.sex; }
+    return data;
+  }
+
   ngOnInit(): void {
     this.reloadHorses();
   }
 
+  ngAfterViewInit(): void {
+    this.formChanged = this.ngForm?.valueChanges?.pipe(
+      debounceTime(250)
+    ).subscribe(
+      this.reloadHorses.bind(this)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.formChanged?.unsubscribe();
+  }
+
   reloadHorses() {
-    this.service.getAll()
+    this.service.searchAll(this.cleanSearchData)
       .subscribe({
         next: data => {
           this.horses = data;

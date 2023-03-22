@@ -2,7 +2,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {environment} from 'src/environments/environment';
-import {Horse} from '../dto/horse';
+import {Horse, HorseSearch} from '../dto/horse';
 import {Sex} from '../dto/sex';
 
 const baseUri = environment.backendUrl + '/horses';
@@ -21,8 +21,19 @@ export class HorseService {
    *
    * @return observable list of found horses.
    */
-  getAll(): Observable<Horse[]> {
-    return this.http.get<Horse[]>(baseUri);
+  searchAll(searchData: HorseSearch = {}): Observable<Horse[]> {
+
+    /* iterate through object and add params typesafe */
+    let params = new HttpParams();
+    Object.keys(searchData).forEach(key => {
+      const objKey = key as keyof HorseSearch;
+      const objVal = searchData[objKey];
+      if(objVal !== undefined) {
+        params = params.append(objKey, objVal);
+      }
+    });
+
+    return this.http.get<Horse[]>(baseUri, {params});
   }
 
   /**

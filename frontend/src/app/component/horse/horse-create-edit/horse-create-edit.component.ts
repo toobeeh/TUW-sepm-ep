@@ -95,7 +95,7 @@ export class HorseCreateEditComponent implements OnInit {
 
   parentSuggestions = (input: string) => (input === '')
     ? of([])
-    : this.service.getAll().pipe(map(horses => horses.filter(horse => horse.name.indexOf(input) === 0).slice(0,5)));
+    : this.service.searchAll().pipe(map(horses => horses.filter(horse => horse.name.indexOf(input) === 0).slice(0,5)));
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
