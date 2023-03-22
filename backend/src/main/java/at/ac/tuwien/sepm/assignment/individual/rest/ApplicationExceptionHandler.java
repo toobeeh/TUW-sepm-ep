@@ -29,7 +29,7 @@ public class ApplicationExceptionHandler {
   @ExceptionHandler
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
-  public NotFoundErrorRestDto handleValidationException(NotFoundException e) {
+  public NotFoundErrorRestDto handleNotFoundException(NotFoundException e) {
     LOG.warn("Terminating request processing with status 404 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
     return new NotFoundErrorRestDto(e.getMessage());
   }
@@ -37,7 +37,7 @@ public class ApplicationExceptionHandler {
   @ExceptionHandler
   @ResponseStatus(HttpStatus.CONFLICT)
   @ResponseBody
-  public ConflictErrorRestDto handleValidationException(ConflictException e) {
+  public ConflictErrorRestDto handleConflictException(ConflictException e) {
     LOG.warn("Terminating request processing with status 409 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
     return new ConflictErrorRestDto(e.summary(), e.errors());
   }
