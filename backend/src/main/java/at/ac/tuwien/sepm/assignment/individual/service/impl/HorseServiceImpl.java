@@ -17,6 +17,9 @@ import at.ac.tuwien.sepm.assignment.individual.service.HorseService;
 import at.ac.tuwien.sepm.assignment.individual.service.OwnerService;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -79,7 +82,7 @@ public class HorseServiceImpl implements HorseService {
 
     return mapper.entityToChildDetailDto(
         updatedHorse,
-        ownerMapForSingleId(updatedHorse.getOwnerId()),
+        ownerMapForMultipleId(Arrays.asList(updatedHorse.getOwnerId(), father.getOwnerId(), mother.getOwnerId())),
         father,
         mother);
   }
@@ -99,7 +102,7 @@ public class HorseServiceImpl implements HorseService {
 
     return mapper.entityToChildDetailDto(
         createdHorse,
-        ownerMapForSingleId(createdHorse.getOwnerId()),
+        ownerMapForMultipleId(Arrays.asList(createdHorse.getOwnerId(), father.getOwnerId(), mother.getOwnerId())),
         father,
         mother
     );
@@ -115,7 +118,7 @@ public class HorseServiceImpl implements HorseService {
 
     return mapper.entityToChildDetailDto(
         horse,
-        ownerMapForSingleId(horse.getOwnerId()),
+        ownerMapForMultipleId(Arrays.asList(horse.getOwnerId(), father.getOwnerId(), mother.getOwnerId())),
         father,
         mother);
   }
@@ -134,6 +137,17 @@ public class HorseServiceImpl implements HorseService {
           : Collections.singletonMap(ownerId, ownerService.getById(ownerId));
     } catch (NotFoundException e) {
       throw new FatalException("Owner %d referenced by horse not found".formatted(ownerId));
+    }
+  }
+
+  private Map<Long, OwnerDto> ownerMapForMultipleId(Collection<Long> ownerIds) {
+    try {
+      return ownerIds == null
+          ? null
+          : ownerService.getAllById(ownerIds);
+    } catch (NotFoundException e) {
+      throw new FatalException("One of owners %d referenced by horse not found"
+          .formatted(ownerIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))));
     }
   }
 
