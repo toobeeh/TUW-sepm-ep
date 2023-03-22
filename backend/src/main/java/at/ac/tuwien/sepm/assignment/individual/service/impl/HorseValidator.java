@@ -52,6 +52,8 @@ public class HorseValidator {
       if (name.length() > 255) {
         validationErrors.add("Horse name too long: longer than 255 characters");
       }
+    } else {
+      validationErrors.add("Horse name is not set");
     }
   }
 

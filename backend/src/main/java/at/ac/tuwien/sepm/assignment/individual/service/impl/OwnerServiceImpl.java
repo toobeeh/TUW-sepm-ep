@@ -8,12 +8,14 @@ import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepm.assignment.individual.mapper.OwnerMapper;
 import at.ac.tuwien.sepm.assignment.individual.persistence.OwnerDao;
 import at.ac.tuwien.sepm.assignment.individual.service.OwnerService;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,11 +27,15 @@ public class OwnerServiceImpl implements OwnerService {
   private final OwnerDao dao;
   private final OwnerMapper mapper;
 
+  private final OwnerValidator validator;
+
   public OwnerServiceImpl(
       OwnerDao dao,
-      OwnerMapper mapper) {
+      OwnerMapper mapper,
+      OwnerValidator validator) {
     this.dao = dao;
     this.mapper = mapper;
+    this.validator = validator;
   }
 
   @Override
@@ -63,7 +69,7 @@ public class OwnerServiceImpl implements OwnerService {
   @Override
   public OwnerDto create(OwnerCreateDto newOwner) throws ValidationException {
     LOG.trace("create({})", newOwner);
-    // TODO validation
+    validator.validateForInsert(newOwner);
     return mapper.entityToDto(dao.create(newOwner));
   }
 }
