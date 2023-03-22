@@ -28,6 +28,6 @@ CREATE TABLE IF NOT EXISTS horse
     CONSTRAINT owner
         FOREIGN KEY (owner_id)
             REFERENCES owner (id)
-            ON DELETE SET NULL,
+            ON DELETE SET NULL
 );
 

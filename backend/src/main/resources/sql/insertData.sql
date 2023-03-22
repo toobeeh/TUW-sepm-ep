@@ -5,6 +5,12 @@
 DELETE
 FROM horse;
 
+DELETE
+FROM owner;
+
+INSERT INTO owner (id, first_name, last_name, email)
+VALUES (69, 'Wendeez', 'Nuts', 'wendys@nuts.com');
+
 INSERT INTO horse (id, name, description, date_of_birth, sex)
 VALUES (1, 'Wendy', 'The famous one!', '2012-12-12', 'FEMALE');
 INSERT INTO horse (id, name, description, date_of_birth, sex, mother_id)
