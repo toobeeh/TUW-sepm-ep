@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.assignment.individual.persistence;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 
@@ -13,12 +14,13 @@ import java.util.List;
  * Implements access functionality to the application's persistent data store regarding horses.
  */
 public interface HorseDao {
+
   /**
-   * Get all horses stored in the persistent data store.
+   * Get all horses stored in the persistent data store that match search criteria.
    *
-   * @return a list of all stored horses
+   * @return a list of all stored horses that match the search filter
    */
-  List<Horse> getAll();
+  List<Horse> searchAll(HorseSearchDto searchFilter);
 
 
   /**

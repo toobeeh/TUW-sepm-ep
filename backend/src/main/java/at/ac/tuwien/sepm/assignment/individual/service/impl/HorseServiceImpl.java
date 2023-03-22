@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
@@ -42,9 +43,12 @@ public class HorseServiceImpl implements HorseService {
   }
 
   @Override
-  public Stream<HorseListDto> allHorses() {
-    LOG.trace("allHorses()");
-    var horses = dao.getAll();
+  public Stream<HorseListDto> searchHorses(HorseSearchDto search) {
+    LOG.trace("searchHorses()");
+
+    // TODO: validate filter
+
+    var horses = dao.searchAll(search);
     var ownerIds = horses.stream()
         .map(Horse::getOwnerId)
         .filter(Objects::nonNull)

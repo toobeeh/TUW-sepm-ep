@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
@@ -14,12 +15,13 @@ import java.util.stream.Stream;
  * Service for working with horses.
  */
 public interface HorseService {
+
   /**
-   * Lists all horses stored in the system.
+   * Searches for all horses in the system that match a given filter.
    *
-   * @return list of all stored horses
+   * @return list of all stored horses that match the criteria
    */
-  Stream<HorseListDto> allHorses();
+  Stream<HorseListDto> searchHorses(HorseSearchDto search);
 
 
   /**
@@ -34,7 +36,7 @@ public interface HorseService {
    * @throws ConflictException   if the update data given for the horse is in conflict the data currently in the system (owner does not exist, …)
    */
   HorseChildDetailDto update(HorseChildDetailDto horse) throws NotFoundException, ValidationException, ConflictException;
-  
+
   /**
    * Creates the horse with the data given in {@code horse}
    * in the persistent data store.

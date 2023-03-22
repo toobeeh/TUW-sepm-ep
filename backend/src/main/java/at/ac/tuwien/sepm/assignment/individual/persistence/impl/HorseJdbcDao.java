@@ -2,7 +2,7 @@ package at.ac.tuwien.sepm.assignment.individual.persistence.impl;
 
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
@@ -15,14 +15,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
@@ -31,7 +34,6 @@ public class HorseJdbcDao implements HorseDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private static final String TABLE_NAME = "horse";
-  private static final String SQL_SELECT_ALL = "SELECT * FROM " + TABLE_NAME;
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
   private static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
   private static final String SQL_UPDATE = "UPDATE " + TABLE_NAME
@@ -55,9 +57,48 @@ public class HorseJdbcDao implements HorseDao {
   }
 
   @Override
-  public List<Horse> getAll() {
-    LOG.trace("getAll()");
-    return jdbcTemplate.query(SQL_SELECT_ALL, this::mapRow);
+  public List<Horse> searchAll(HorseSearchDto searchFilter) {
+    LOG.trace("searchAll()");
+    List<Horse> horses;
+
+    Function<String, String> like = str -> "%" + str + "%";
+
+    var sqlParams = new MapSqlParameterSource();
+    var namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+    String sql = "SELECT * FROM " + TABLE_NAME + " WHERE 1=1";
+
+    if (searchFilter.name() != null) {
+      sql += " AND name LIKE :name";
+      sqlParams.addValue("name", like.apply(searchFilter.name()));
+    }
+    if (searchFilter.description() != null) {
+      sql += " AND description LIKE :description";
+      sqlParams.addValue("description", like.apply(searchFilter.description()));
+    }
+    if (searchFilter.sex() != null) {
+      sql += " AND sex = :sex";
+      sqlParams.addValue("sex", searchFilter.sex());
+    }
+    if (searchFilter.bornBefore() != null) {
+      sql += " AND date_of_birth <  = :birth";
+      sqlParams.addValue("birth", Date.valueOf(searchFilter.bornBefore()));
+    }
+    if (searchFilter.ownerName() != null) {
+      sql += " AND owner_id IN (SELECT * FROM owners WHERE first_name LIKE :owner OR last_name LIKE :owner";
+      sqlParams.addValue("owner", like.apply(searchFilter.ownerName()));
+    }
+    if (searchFilter.limit() != null) {
+      sql += " LIMIT :limit";
+      sqlParams.addValue("limit", searchFilter.limit());
+    }
+
+    horses = namedTemplate.query(
+        sql,
+        sqlParams,
+        this::mapRow
+    );
+
+    return horses;
   }
 
   @Override
