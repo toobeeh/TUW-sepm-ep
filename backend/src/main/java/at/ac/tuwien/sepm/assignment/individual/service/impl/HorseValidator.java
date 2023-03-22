@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.assignment.individual.service.impl;
 
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;

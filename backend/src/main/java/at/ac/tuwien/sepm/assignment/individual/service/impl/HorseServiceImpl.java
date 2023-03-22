@@ -46,7 +46,7 @@ public class HorseServiceImpl implements HorseService {
   public Stream<HorseListDto> searchHorses(HorseSearchDto search) {
     LOG.trace("searchHorses()");
 
-    // TODO: validate filter
+    // search need not be validated: sex & date validated by parser;
 
     var horses = dao.searchAll(search);
     var ownerIds = horses.stream()

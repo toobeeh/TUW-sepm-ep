@@ -61,30 +61,30 @@ public class HorseJdbcDao implements HorseDao {
     LOG.trace("searchAll()");
     List<Horse> horses;
 
-    Function<String, String> like = str -> "%" + str + "%";
+    Function<String, String> like = str -> "%" + str.toLowerCase() + "%";
 
     var sqlParams = new MapSqlParameterSource();
     var namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     String sql = "SELECT * FROM " + TABLE_NAME + " WHERE 1=1";
 
     if (searchFilter.name() != null) {
-      sql += " AND name LIKE :name";
+      sql += " AND LOWER(name) LIKE :name";
       sqlParams.addValue("name", like.apply(searchFilter.name()));
     }
     if (searchFilter.description() != null) {
-      sql += " AND description LIKE :description";
+      sql += " AND LOWER(description) LIKE :description";
       sqlParams.addValue("description", like.apply(searchFilter.description()));
     }
     if (searchFilter.sex() != null) {
       sql += " AND sex = :sex";
-      sqlParams.addValue("sex", searchFilter.sex());
+      sqlParams.addValue("sex", searchFilter.sex().name());
     }
     if (searchFilter.bornBefore() != null) {
-      sql += " AND date_of_birth <  = :birth";
+      sql += " AND date_of_birth < :birth";
       sqlParams.addValue("birth", Date.valueOf(searchFilter.bornBefore()));
     }
     if (searchFilter.ownerName() != null) {
-      sql += " AND owner_id IN (SELECT * FROM owners WHERE first_name LIKE :owner OR last_name LIKE :owner";
+      sql += " AND owner_id IN (SELECT * FROM owners WHERE LOWER(first_name) LIKE :owner OR LOWER(last_name) LIKE :owner";
       sqlParams.addValue("owner", like.apply(searchFilter.ownerName()));
     }
     if (searchFilter.limit() != null) {
