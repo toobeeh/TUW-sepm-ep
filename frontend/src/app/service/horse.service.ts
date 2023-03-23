@@ -1,9 +1,8 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {environment} from 'src/environments/environment';
-import {Horse, HorseSearch} from '../dto/horse';
-import {Sex} from '../dto/sex';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import { Horse, HorseSearch, HorseTree } from '../dto/horse';
 
 const baseUri = environment.backendUrl + '/horses';
 
@@ -28,12 +27,12 @@ export class HorseService {
     Object.keys(searchData).forEach(key => {
       const objKey = key as keyof HorseSearch;
       const objVal = searchData[objKey];
-      if(objVal !== undefined) {
+      if (objVal !== undefined) {
         params = params.append(objKey, objVal);
       }
     });
 
-    return this.http.get<Horse[]>(baseUri, {params});
+    return this.http.get<Horse[]>(baseUri, { params });
   }
 
   /**
@@ -43,6 +42,15 @@ export class HorseService {
    */
   get(id: number): Observable<Horse> {
     return this.http.get<Horse>(`${baseUri}/${id}`);
+  }
+
+  /**
+   * Get all horses stored in the system
+   *
+   * @return observable list of found horses.
+   */
+  getAncestors(id: number, generations: number): Observable<HorseTree> {
+    return this.http.get<HorseTree>(`${baseUri}/ancestors/${id}?generations=${generations}`);
   }
 
   /**

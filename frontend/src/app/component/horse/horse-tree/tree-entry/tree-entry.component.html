@@ -1,0 +1,61 @@
+<div
+  class="border rounded tree-child expanded"
+  [ngClass]="ngClass"
+  *ngIf="horse"
+>
+  <div
+    class="border border-secondary rounded expand-icon"
+    role="button"
+    [class.disabled]="noParentsAvailable"
+    [attr.aria-disabled]="noParentsAvailable"
+    (click)="toggle()"
+  >
+    <i class="bi bi-chevron-down"></i>
+  </div>
+  <div>
+    {{ horse.name }}
+  </div>
+  <i class="bi" [ngClass]="genderClass"></i>
+  <div class="birth">
+    {{ horse.dateOfBirth | date : 'longDate' }}
+  </div>
+  <div class="btn-group">
+    <a
+      class="btn btn-sm responsive-info-button"
+      [routerLink]="['../../', 'view', horse.id]"
+      aria-label="Show horse details"
+    >
+      <i class="bi bi-info-lg"></i>
+    </a>
+    <a
+      class="btn btn-sm responsive-warning-button"
+      [routerLink]="['../../', 'edit', horse.id]"
+      aria-label="Edit horse"
+    >
+      <i class="bi bi-pencil"></i>
+    </a>
+    <a
+      class="btn btn-sm responsive-danger-button"
+      (click)="delete(horse)"
+      aria-label="Edit horse"
+    >
+      <i class="bi bi-trash"></i>
+    </a>
+  </div>
+</div>
+<div
+  *ngIf="showParents"
+  [@slide]="showParents ? 'visible' : 'hidden'"
+  class="tree-parents"
+>
+  <app-tree-entry
+    *ngIf="horse && horse.mother"
+    [horse]="horse.mother"
+    [deleteSubject]="deleteSubject"
+  ></app-tree-entry>
+  <app-tree-entry
+    *ngIf="horse && horse.father"
+    [horse]="horse.father"
+    [deleteSubject]="deleteSubject"
+  ></app-tree-entry>
+</div>

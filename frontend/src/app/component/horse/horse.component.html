@@ -95,7 +95,12 @@
       <th class="min-width">Actions</th>
     </thead>
     <tbody>
-      <tr *ngFor="let horse of horses" class="center-td">
+      <tr
+        *ngFor="let horse of horses"
+        class="center-td cursor-pointer"
+        [routerLink]="['tree', horse.id]"
+        role="button"
+      >
         <td>{{ horse.name }}</td>
         <td>{{ horse.description }}</td>
         <td>{{ horse.dateOfBirth | date : 'longDate' }}</td>
@@ -120,7 +125,7 @@
             <a
               class="btn btn-sm responsive-danger-button"
               (click)="delete(horse.id, horse)"
-              aria-label="Edit horse"
+              aria-label="Delete horse"
             >
               <i class="bi bi-trash"></i>
             </a>

@@ -4,6 +4,7 @@ import {
   HorseCreateEditComponent,
   HorseCreateEditMode,
 } from './component/horse/horse-create-edit/horse-create-edit.component';
+import { HorseTreeComponent } from './component/horse/horse-tree/horse-tree.component';
 import { HorseComponent } from './component/horse/horse.component';
 import { OwnerCreateComponent } from './component/owner/owner-create/owner-create.component';
 import { OwnerComponent } from './component/owner/owner.component';
@@ -29,6 +30,10 @@ const routes: Routes = [
         component: HorseCreateEditComponent,
         data: { mode: HorseCreateEditMode.view },
       },
+      {
+        path: 'tree/:id',
+        component: HorseTreeComponent
+      },
     ],
   },
   {
@@ -45,4 +50,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

@@ -1,0 +1,53 @@
+@use "sass:map";
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+.expand-icon {
+  height: 1.5em;
+  padding:.5em;
+  display:grid;
+  place-content: center;
+  aspect-ratio: 1;
+  box-sizing: content-box;
+}
+
+.expand-icon i {
+  transition: transform .2s;
+}
+
+.tree-child:not(.expanded) .expand-icon i {
+  transform: rotate(-90deg);
+}
+
+.tree-child {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  padding: .5em;
+}
+
+.tree-parents {
+  padding-left: 2em;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity:.5;
+}
+
+.birth {
+  flex-grow: 1;
+  text-align: right;
+}
+
+.responsive-info-button, .responsive-warning-button, .responsive-danger-button, .responsive-dark-button, .responsive-tree-button {
+  @include button-variant($light, $light);
+}
+
+@each $color in (info, warning, danger) {
+  $value: map.get($theme-colors, $color);
+  .tree-child:hover .responsive-#{$color}-button {
+      @include button-variant($value, $value);
+  }
+}
