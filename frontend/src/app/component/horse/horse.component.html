@@ -77,7 +77,7 @@
       name="searchHorseOwner"
       textInputClass="form-control"
       valueNeedsToMatchSuggestion="false"
-      formatModel="formatOwnerName"
+      [formatModel]="formatAutocompleteInput"
       [suggestions]="ownerSuggestions"
     >
     </app-autocomplete>

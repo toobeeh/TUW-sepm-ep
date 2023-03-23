@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { debounce, debounceTime, of, Subject, Subscription } from 'rxjs';
+import { debounce, debounceTime, map, of, Subject, Subscription } from 'rxjs';
 import { Sex } from 'src/app/dto/sex';
 import { HorseService } from 'src/app/service/horse.service';
 import { OwnerService } from 'src/app/service/owner.service';
@@ -32,7 +32,7 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
     private service: HorseService,
     private notification: ToastrService,
     private ownerService: OwnerService
-  ) {}
+  ) { }
 
   private get cleanSearchData() {
     const data = { ...this.searchData };
@@ -83,10 +83,20 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ownerSuggestions = (input: string) =>
-    input === '' ? of([]) : this.ownerService.searchByName(input, 5);
+    input === ''
+      ? of([])
+      : this.ownerService.searchByName(input, 5)
+        .pipe(
+          map(owners =>
+            owners.map(o => [o.firstName, o.lastName].filter(s => s.length > 0).join(' '))
+          ));
 
   public formatOwnerName(owner: Owner | null | undefined): string {
     return owner == null ? '' : `${owner.firstName} ${owner.lastName}`;
+  }
+
+  public formatAutocompleteInput(owner: string | null | undefined): string {
+    return owner == null ? '' : owner;
   }
 
   dateOfBirthAsLocaleDate(horse: Horse): string {
