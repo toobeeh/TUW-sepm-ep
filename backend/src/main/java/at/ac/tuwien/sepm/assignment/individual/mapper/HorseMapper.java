@@ -67,6 +67,7 @@ public class HorseMapper {
         root.getId(),
         root.getName(),
         root.getSex(),
+        root.getDateOfBirth(),
         fatherDto,
         motherDto
     );
