@@ -44,8 +44,8 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
     if (data.name?.length === 0) {
       delete data.name;
     }
-    if (data.owner?.length === 0) {
-      delete data.owner;
+    if (data.ownerName?.length === 0) {
+      delete data.ownerName;
     }
     if (data.sex?.length === 0) {
       delete data.sex;

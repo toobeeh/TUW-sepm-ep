@@ -1,5 +1,5 @@
-import {Owner} from './owner';
-import {Sex} from './sex';
+import { Owner } from './owner';
+import { Sex } from './sex';
 
 export interface Horse {
   id?: number;
@@ -17,5 +17,5 @@ export interface HorseSearch {
   description?: string;
   bornBefore?: string;
   sex?: Sex;
-  owner?: string;
+  ownerName?: string;
 }
