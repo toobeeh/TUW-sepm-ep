@@ -84,7 +84,7 @@ public class HorseJdbcDao implements HorseDao {
       sqlParams.addValue("birth", Date.valueOf(searchFilter.bornBefore()));
     }
     if (searchFilter.ownerName() != null) {
-      sql += " AND owner_id IN (SELECT * FROM owners WHERE LOWER(first_name) LIKE :owner OR LOWER(last_name) LIKE :owner";
+      sql += " AND owner_id IN (SELECT id FROM owner WHERE LOWER(first_name) LIKE :owner OR LOWER(last_name) LIKE :owner)";
       sqlParams.addValue("owner", like.apply(searchFilter.ownerName()));
     }
     if (searchFilter.limit() != null) {
