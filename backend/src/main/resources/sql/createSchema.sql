@@ -1,3 +1,4 @@
+-- create owner table
 CREATE TABLE IF NOT EXISTS owner
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -6,6 +7,7 @@ CREATE TABLE IF NOT EXISTS owner
     email      VARCHAR(255)
 );
 
+-- create horse table
 CREATE TABLE IF NOT EXISTS horse
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -30,4 +32,12 @@ CREATE TABLE IF NOT EXISTS horse
             REFERENCES owner (id)
             ON DELETE SET NULL
 );
+
+-- remove test data, if existing
+DELETE
+FROM owner
+WHERE id < 0;
+DELETE
+FROM horse
+WHERE id < 0;
 
