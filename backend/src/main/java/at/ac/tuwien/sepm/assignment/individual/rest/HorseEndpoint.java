@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseTreeDto;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,6 +52,12 @@ public class HorseEndpoint {
   public HorseChildDetailDto getById(@PathVariable long id) throws NotFoundException {
     LOG.info("GET " + BASE_PATH + "/{}", id);
     return service.getById(id);
+  }
+
+  @GetMapping("ancestors/{id}")
+  public HorseTreeDto getAncestors(@PathVariable Long id, @RequestParam(name = "generations") Long generations) throws NotFoundException {
+    LOG.info("GET " + BASE_PATH + "/{}?generations=", id, generations);
+    return service.getAncestors(id, generations);
   }
 
 

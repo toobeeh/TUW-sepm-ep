@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseTreeDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
@@ -23,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,6 +66,23 @@ public class HorseServiceImpl implements HorseService {
     }
     return horses.stream()
         .map(horse -> mapper.entityToListDto(horse, ownerMap));
+  }
+
+  @Override
+  public HorseTreeDto getAncestors(long rootId, long generations) throws NotFoundException {
+    LOG.trace("getAncestors({},{})", rootId, generations);
+
+    /* TODO: validate params */
+
+    // map horses and get root horse
+    var ancestors = dao.getAncestors(rootId, generations);
+    Supplier<Stream<Horse>> pool = () -> ancestors.stream();
+    var root = pool.get().filter(hors -> hors.getId() == rootId).findFirst();
+    if (root.isEmpty()) {
+      throw new FatalException("Horse ancestors didnt include horse itself");
+    }
+
+    return mapper.findAncestors(root.get(), pool);
   }
 
 

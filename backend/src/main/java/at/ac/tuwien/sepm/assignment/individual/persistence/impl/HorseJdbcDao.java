@@ -35,6 +35,18 @@ public class HorseJdbcDao implements HorseDao {
 
   private static final String TABLE_NAME = "horse";
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+  private static final String SQL_GET_NTH_GEN_ANCESTORS = "SELECT *  FROM horse WHERE id IN (" +
+      " WITH ancestors (id, name, mother_id, father_id, generation) AS (" +
+      " SELECT id, name, father_id, mother_id, 1 AS generation" +
+      " FROM " + TABLE_NAME +
+      " WHERE id = ?" +
+      " UNION ALL" +
+      " SELECT h.id, h.name, h.father_id, h.mother_id, a.generation + 1" +
+      " FROM ancestors a" +
+      " JOIN horse h ON h.id = a.father_id OR h.id = a.mother_id" +
+      " WHERE a.generation < ?)" +
+      " SELECT DISTINCT id" +
+      " FROM ancestors);";
   private static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
   private static final String SQL_UPDATE = "UPDATE " + TABLE_NAME
       + " SET name = ?"
@@ -116,6 +128,18 @@ public class HorseJdbcDao implements HorseDao {
     }
 
     return horses.get(0);
+  }
+
+  public List<Horse> getAncestors(long rootId, long generations) throws NotFoundException {
+    LOG.trace("getAncestors({},{})", rootId, generations);
+    List<Horse> ancestors;
+    ancestors = jdbcTemplate.query(SQL_GET_NTH_GEN_ANCESTORS, this::mapRow, rootId, generations);
+
+    if (ancestors.isEmpty()) {
+      throw new NotFoundException("No horse with ID %d found".formatted(rootId));
+    }
+
+    return ancestors;
   }
 
   @Override

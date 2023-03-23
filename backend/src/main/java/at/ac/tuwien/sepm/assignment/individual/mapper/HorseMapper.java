@@ -3,12 +3,16 @@ package at.ac.tuwien.sepm.assignment.individual.mapper;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseTreeDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +46,29 @@ public class HorseMapper {
         horse.getDateOfBirth(),
         horse.getSex(),
         getOwner(horse, owners)
+    );
+  }
+
+  /**
+   * Convert a horse entity object to a {@link HorseTreeDto} and include all its ancestors from a pool.
+   *
+   * @param root the horse at the bottom of the family tree
+   * @param pool a pool of possible ancestor horses. to find ancestors of the parents, the parents are not removed since the family tree could contain more complex inheritance lines.
+   * @return the converted {@link HorseTreeDto}
+   */
+  public HorseTreeDto findAncestors(Horse root, Supplier<Stream<Horse>> pool) {
+    var father = pool.get().filter(hors -> hors.getId() == root.getFatherId()).findFirst();
+    var mother = pool.get().filter(hors -> hors.getId() == root.getMotherId()).findFirst();
+
+    var fatherDto = father.isEmpty() ? null : findAncestors(father.get(), pool);
+    var motherDto = mother.isEmpty() ? null : findAncestors(mother.get(), pool);
+
+    return new HorseTreeDto(
+        root.getId(),
+        root.getName(),
+        root.getSex(),
+        fatherDto,
+        motherDto
     );
   }
 

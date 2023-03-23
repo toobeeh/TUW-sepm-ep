@@ -52,4 +52,4 @@ VALUES (1, 'Ferdinand of Aragon', NULL, '1452-03-10', 'MALE', 66, NULL, NULL),
        (28, 'Maria Anna of Austria', NULL, '1606-08-18', 'FEMALE', NULL, 24, 25),
        (29, 'Ferdinand III', 'Holy Roman Emperor', '1608-07-13', 'MALE', NULL, 26, NULL),
        (30, 'Mariana of Austria', NULL, '1624-12-24', 'FEMALE', NULL, 26, 28),
-       (31, 'Charles II', 'Last Habsburg ruler of Spain', '1661-09-06', 'MALE', NULL, 17, 30);
+       (31, 'Charles II', 'Last Habsburg ruler of Spain', '1661-09-06', 'MALE', NULL, 27, 30);
