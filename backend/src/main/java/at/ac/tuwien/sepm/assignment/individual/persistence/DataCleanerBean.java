@@ -13,8 +13,8 @@ import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
 
 /**
- * This component is only created, if the profile {@code datagen} is active
- * You can activate this profile by adding {@code -Dspring.profiles.active=datagen} to your maven command line
+ * This component is only created, if the profile {@code datagen} is NOT active
+ * You can (de)activate this profile by adding {@code -Dspring.profiles.active=datagen} to your maven command line
  */
 @Component
 @Profile("!datagen")
@@ -30,7 +30,7 @@ public class DataCleanerBean {
   }
 
   @PostConstruct
-  public void generateData() throws SQLException {
+  public void removeData() throws SQLException {
     LOGGER.info("Removing possible test data…");
     try (var connection = dataSource.getConnection()) {
       ScriptUtils.executeSqlScript(connection, new ClassPathResource("sql/removeTestData.sql"));

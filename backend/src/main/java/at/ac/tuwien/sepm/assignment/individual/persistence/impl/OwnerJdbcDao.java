@@ -6,6 +6,7 @@ import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.entity.Owner;
 import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
+import at.ac.tuwien.sepm.assignment.individual.persistence.HorseDao;
 import at.ac.tuwien.sepm.assignment.individual.persistence.OwnerDao;
 
 import java.lang.invoke.MethodHandles;
@@ -28,6 +29,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Implementation of horse persistence management compliant to {@link OwnerDao}
+ */
 @Repository
 public class OwnerJdbcDao implements OwnerDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -35,7 +39,6 @@ public class OwnerJdbcDao implements OwnerDao {
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
   private static final String SQL_SELECT_ALL = "SELECT * FROM " + TABLE_NAME + " WHERE id IN (:ids)";
   private static final String SQL_CREATE = "INSERT INTO " + TABLE_NAME + " (first_name, last_name, email) VALUES (?, ?, ?)";
-
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate jdbcNamed;
 
@@ -44,10 +47,10 @@ public class OwnerJdbcDao implements OwnerDao {
     this.jdbcNamed = jdbcNamed;
   }
 
-
   @Override
   public Owner getById(long id) throws NotFoundException {
     LOG.trace("getById({})", id);
+
     List<Owner> owners = jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, id);
     if (owners.isEmpty()) {
       throw new NotFoundException("Owner with ID %d not found".formatted(id));
@@ -56,6 +59,7 @@ public class OwnerJdbcDao implements OwnerDao {
       // If this happens, something is wrong with either the DB or the select
       throw new FatalException("Found more than one owner with ID %d".formatted(id));
     }
+
     return owners.get(0);
   }
 
@@ -75,7 +79,7 @@ public class OwnerJdbcDao implements OwnerDao {
     Number key = keyHolder.getKey();
     if (key == null) {
       // This should never happen. If it does, something is wrong with the DB or the way the prepared statement is set up.
-      throw new FatalException("Could not extract key for newly created owner. There is probably a programming error…");
+      throw new FatalException("Could not extract key for newly created owner");
     }
 
     return new Owner()
@@ -89,6 +93,7 @@ public class OwnerJdbcDao implements OwnerDao {
   @Override
   public Collection<Owner> getAllById(Collection<Long> ids) {
     LOG.trace("getAllById({})", ids);
+
     var statementParams = Collections.singletonMap("ids", ids);
     return jdbcNamed.query(SQL_SELECT_ALL, statementParams, this::mapRow);
   }
@@ -96,12 +101,11 @@ public class OwnerJdbcDao implements OwnerDao {
   @Override
   public Collection<Owner> search(OwnerSearchDto searchParameters) {
     LOG.trace("search({})", searchParameters);
-    List<Owner> owners;
 
+    List<Owner> owners;
     Function<String, String> like = str -> "%" + str.toLowerCase() + "%";
 
     var sqlParams = new MapSqlParameterSource();
-    var namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     String sql = "SELECT * FROM " + TABLE_NAME + " WHERE 1=1";
 
     if (searchParameters.name() != null) {
@@ -113,7 +117,7 @@ public class OwnerJdbcDao implements OwnerDao {
       sqlParams.addValue("limit", searchParameters.maxAmount());
     }
 
-    owners = namedTemplate.query(
+    owners = jdbcNamed.query(
         sql,
         sqlParams,
         this::mapRow
@@ -122,7 +126,15 @@ public class OwnerJdbcDao implements OwnerDao {
     return owners;
   }
 
-  private Owner mapRow(ResultSet resultSet, int i) throws SQLException {
+  /**
+   * maps a db result set to an owner entity
+   *
+   * @param resultSet result from the db
+   * @param rownum    the row id
+   * @return owner entity
+   * @throws SQLException an error occurred during the mapping
+   */
+  private Owner mapRow(ResultSet resultSet, int rownum) throws SQLException {
     return new Owner()
         .setId(resultSet.getLong("id"))
         .setFirstName(resultSet.getString("first_name"))

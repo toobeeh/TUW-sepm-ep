@@ -25,7 +25,8 @@ public interface HorseDao {
   /**
    * Get all horses that are ancestors of at max the nth generation of a horse.
    *
-   * @return a list of all stored horses that are anchestors
+   * @return a list of all stored horses that are ancestors
+   * @throws NotFoundException the root horse could not be found
    */
   List<Horse> getAncestors(long rootId, long generations) throws NotFoundException;
 

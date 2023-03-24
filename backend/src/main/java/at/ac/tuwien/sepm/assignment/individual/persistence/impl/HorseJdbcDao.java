@@ -29,10 +29,12 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Implementation of horse persistence management compliant to {@link HorseDao}
+ */
 @Repository
 public class HorseJdbcDao implements HorseDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
   private static final String TABLE_NAME = "horse";
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
   private static final String SQL_GET_NTH_GEN_ANCESTORS = "SELECT *  FROM horse WHERE id IN (" +
@@ -60,23 +62,23 @@ public class HorseJdbcDao implements HorseDao {
   private static final String SQL_CREATE = "INSERT INTO " + TABLE_NAME
       + "(name, description, date_of_birth, sex, owner_id, father_id, mother_id) " +
       "VALUES(?, ? ,?, ?, ?, ?, ?)";
-
   private final JdbcTemplate jdbcTemplate;
+  private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
   public HorseJdbcDao(
-      JdbcTemplate jdbcTemplate) {
+      JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
+    this.namedJdbcTemplate = namedJdbcTemplate;
   }
 
   @Override
   public List<Horse> searchAll(HorseSearchDto searchFilter) {
-    LOG.trace("searchAll()");
-    List<Horse> horses;
+    LOG.trace("searchAll({})", searchFilter);
 
+    List<Horse> horses;
     Function<String, String> like = str -> "%" + str.toLowerCase() + "%";
 
     var sqlParams = new MapSqlParameterSource();
-    var namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     String sql = "SELECT * FROM " + TABLE_NAME + " WHERE 1=1";
 
     if (searchFilter.name() != null) {
@@ -104,18 +106,18 @@ public class HorseJdbcDao implements HorseDao {
       sqlParams.addValue("limit", searchFilter.limit());
     }
 
-    horses = namedTemplate.query(
+    horses = namedJdbcTemplate.query(
         sql,
         sqlParams,
         this::mapRow
     );
-
     return horses;
   }
 
   @Override
   public Horse getById(long id) throws NotFoundException {
     LOG.trace("getById({})", id);
+
     List<Horse> horses;
     horses = jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, id);
 
@@ -123,7 +125,7 @@ public class HorseJdbcDao implements HorseDao {
       throw new NotFoundException("No horse with ID %d found".formatted(id));
     }
     if (horses.size() > 1) {
-      // This should never happen!!
+      // This should never happen!
       throw new FatalException("Too many horses with ID %d found".formatted(id));
     }
 
@@ -132,6 +134,7 @@ public class HorseJdbcDao implements HorseDao {
 
   public List<Horse> getAncestors(long rootId, long generations) throws NotFoundException {
     LOG.trace("getAncestors({},{})", rootId, generations);
+
     List<Horse> ancestors;
     ancestors = jdbcTemplate.query(SQL_GET_NTH_GEN_ANCESTORS, this::mapRow, rootId, generations);
 
@@ -145,6 +148,7 @@ public class HorseJdbcDao implements HorseDao {
   @Override
   public void delete(long id) throws NotFoundException {
     LOG.trace("delete({})", id);
+
     int updated = jdbcTemplate.update(SQL_DELETE, id);
 
     if (updated == 0) {
@@ -152,10 +156,10 @@ public class HorseJdbcDao implements HorseDao {
     }
   }
 
-
   @Override
   public Horse update(HorseChildDetailDto horse) throws NotFoundException {
     LOG.trace("update({})", horse);
+
     int updated = jdbcTemplate.update(SQL_UPDATE,
         horse.name(),
         horse.description(),
@@ -180,7 +184,6 @@ public class HorseJdbcDao implements HorseDao {
         .setMotherId(horse.motherId());
   }
 
-
   @Override
   public Horse create(HorseCreateDto horse) {
     LOG.trace("create({})", horse);
@@ -202,7 +205,7 @@ public class HorseJdbcDao implements HorseDao {
     Number key = keyHolder.getKey();
     if (key == null) {
       // This should never happen. If it does, something is wrong with the DB or the way the prepared statement is set up.
-      throw new FatalException("Could not extract key for newly created owner. There is probably a programming error… kek");
+      throw new FatalException("Could not extract key for newly created horse");
     }
 
     return new Horse()
@@ -216,7 +219,14 @@ public class HorseJdbcDao implements HorseDao {
         .setMotherId(horse.motherId());
   }
 
-
+  /**
+   * maps a db result set to a horse entity
+   *
+   * @param result result from the db
+   * @param rownum the row id
+   * @return horse entity
+   * @throws SQLException an error occurred during the mapping
+   */
   private Horse mapRow(ResultSet result, int rownum) throws SQLException {
     return new Horse()
         .setId(result.getLong("id"))

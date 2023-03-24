@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.assignment.individual.dto.OwnerCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Owner;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
+
 import java.util.Collection;
 
 /**
@@ -22,7 +23,7 @@ public interface OwnerDao {
 
   /**
    * Fetch a set of owners by their IDs from the persistent data store.
-   * This is best effort, if some owner can not be found in the data store, it is simply not in the returned set.
+   * This is the best effort, if some owner can not be found in the data store, it is simply not in the returned set.
    *
    * @param ids a collection of ids, to fetch the referenced owners by.
    * @return the collection of all found owners, without those, that are not in the persistent data store
@@ -34,7 +35,7 @@ public interface OwnerDao {
    * <p>
    * A owner is considered matched, if its name contains {@code searchParameters.name} as a substring.
    * The returned stream of owners never contains more than {@code searchParameters.maxAmount} elements,
-   *  even if there would be more matches in the persistent data store.
+   * even if there would be more matches in the persistent data store.
    * </p>
    *
    * @param searchParameters object containing the search parameters to match
