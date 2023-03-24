@@ -23,7 +23,7 @@ public class DataCleanerBean {
   private final DataSource dataSource;
 
   /**
-   * Executed once when the component is instantiated. Inserts some dummy data.
+   * Executed once when the component is instantiated. Deletes possible test data.
    */
   public DataCleanerBean(DataSource dataSource) {
     this.dataSource = dataSource;

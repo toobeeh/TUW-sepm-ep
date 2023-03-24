@@ -3,8 +3,11 @@ package at.ac.tuwien.sepm.assignment.individual.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
+
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +22,7 @@ public class HorseDaoTest {
 
   @Test
   public void getAllReturnsAllStoredHorses() {
-    List<Horse> horses = horseDao.getAll();
+    List<Horse> horses = horseDao.searchAll(new HorseSearchDto(null, null, null, null, null, null));
     assertThat(horses.size()).isGreaterThanOrEqualTo(1); // TODO adapt to exact number of elements in test data later
     assertThat(horses)
         .extracting(Horse::getId, Horse::getName)

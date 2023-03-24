@@ -58,6 +58,9 @@ public class HorseValidator {
   }
 
   private void validateBirth(List<String> validationErrors, LocalDate birth) {
+    if (birth == null) {
+      validationErrors.add("Horse birth is not given");
+    }
     if (birth.isAfter(LocalDate.now())) {
       validationErrors.add("Horse birth is in the future");
     }
@@ -122,6 +125,19 @@ public class HorseValidator {
     validateParents(validationConflicts, father, mother, horse.dateOfBirth(), null);
     if (!validationConflicts.isEmpty()) {
       throw new ConflictException("Data of horse for create has conflicts", validationConflicts);
+    }
+  }
+
+  public void validateForSearch(Long id, Long generations) throws ValidationException {
+    LOG.trace("validateForSearch({}, {})", id, generations);
+    List<String> validationErrors = new ArrayList<>();
+
+    if (id == null) validationErrors.add("Horse ID is not given");
+    if (generations == null) validationErrors.add("Ancestor generations is not given");
+    if (generations <= 0) validationErrors.add("Ancestor generations have to be bigger than 1");
+
+    if (!validationErrors.isEmpty()) {
+      throw new ValidationException("Validation of horse for create failed", validationErrors);
     }
   }
 

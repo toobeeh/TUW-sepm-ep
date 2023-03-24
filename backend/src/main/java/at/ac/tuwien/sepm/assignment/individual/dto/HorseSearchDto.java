@@ -9,6 +9,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
  * DTO to bundle the query parameters used in searching horses.
  * Each field can be null, in which case this field is not filtered by.
+ *
+ * @param name        a string that has to be contained in the result horse's name
+ * @param description a string that has to be contained in the result horse's description
+ * @param bornBefore  a date which has to be after the result horse's birthdate
+ * @param sex         the result horse's sex
+ * @param ownerName   a string that has to be contained in the result horse's owner first or last name
+ * @param limit       the maximum amount of matching horses to be returned
  */
 public record HorseSearchDto(
     String name,

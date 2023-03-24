@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
+import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +49,12 @@ public class HorseEndpointTest {
         ).andExpect(status().isOk())
         .andReturn().getResponse().getContentAsByteArray();
 
-    List<HorseListDto> horseResult = objectMapper.readerFor(HorseListDto.class).<HorseListDto>readValues(body).readAll();
+    List<HorseDetailDto> horseResult = objectMapper.readerFor(HorseDetailDto.class).<HorseDetailDto>readValues(body).readAll();
 
     assertThat(horseResult).isNotNull();
     assertThat(horseResult.size()).isGreaterThanOrEqualTo(1); // TODO adapt this to the exact number in the test data later
     assertThat(horseResult)
-        .extracting(HorseListDto::id, HorseListDto::name)
+        .extracting(HorseDetailDto::id, HorseDetailDto::name)
         .contains(tuple(-1L, "Wendy"));
   }
 

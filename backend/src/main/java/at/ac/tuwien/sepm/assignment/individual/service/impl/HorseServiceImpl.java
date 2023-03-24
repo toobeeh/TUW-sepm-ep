@@ -3,7 +3,6 @@ package at.ac.tuwien.sepm.assignment.individual.service.impl;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseTreeDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
@@ -18,7 +17,6 @@ import at.ac.tuwien.sepm.assignment.individual.service.HorseService;
 import at.ac.tuwien.sepm.assignment.individual.service.OwnerService;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,7 +46,7 @@ public class HorseServiceImpl implements HorseService {
   }
 
   @Override
-  public Stream<HorseListDto> searchHorses(HorseSearchDto search) {
+  public Stream<HorseDetailDto> searchHorses(HorseSearchDto search) {
     LOG.trace("searchHorses()");
 
     // search need not be validated: sex & date validated by parser;
@@ -65,14 +63,15 @@ public class HorseServiceImpl implements HorseService {
       throw new FatalException("Horse, that is already persisted, refers to non-existing owner", e);
     }
     return horses.stream()
-        .map(horse -> mapper.entityToListDto(horse, ownerMap));
+        .map(horse -> mapper.entityToDetailDto(horse, ownerMap));
   }
 
   @Override
-  public HorseTreeDto getAncestors(long rootId, long generations) throws NotFoundException {
+  public HorseTreeDto getAncestors(long rootId, long generations) throws NotFoundException, ValidationException {
     LOG.trace("getAncestors({},{})", rootId, generations);
 
-    /* TODO: validate params */
+    // validate params
+    validator.validateForSearch(rootId, generations);
 
     // map horses and get root horse
     var ancestors = dao.getAncestors(rootId, generations);

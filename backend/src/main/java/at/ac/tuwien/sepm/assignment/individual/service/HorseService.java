@@ -3,15 +3,12 @@ package at.ac.tuwien.sepm.assignment.individual.service;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseChildDetailDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseDetailDto;
-import at.ac.tuwien.sepm.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.HorseTreeDto;
-import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -24,14 +21,14 @@ public interface HorseService {
    *
    * @return list of all stored horses that match the criteria
    */
-  Stream<HorseListDto> searchHorses(HorseSearchDto search);
+  Stream<HorseDetailDto> searchHorses(HorseSearchDto search);
 
   /**
    * Get all horses that are ancestors of at max the nth generation of a horse.
    *
    * @return a dto that contains a tree of the horses ancestors
    */
-  HorseTreeDto getAncestors(long rootId, long generations) throws NotFoundException;
+  HorseTreeDto getAncestors(long rootId, long generations) throws NotFoundException, ValidationException;
 
 
   /**
