@@ -107,8 +107,8 @@ public class HorseEndpoint {
    *
    * @param toCreate the data of the horse to create
    * @return the created horse
-   * @throws ConflictException   the provided data for the new horse was invalid
-   * @throws ValidationException the provided data for the new horse caused conflicts with other horses or owners
+   * @throws ConflictException   the provided data for the new horse caused conflicts with other horses or owners
+   * @throws ValidationException the provided data for the new horse was invalid
    * @throws NotFoundException   the provided owner of the horse could not be found
    */
   @PostMapping()
