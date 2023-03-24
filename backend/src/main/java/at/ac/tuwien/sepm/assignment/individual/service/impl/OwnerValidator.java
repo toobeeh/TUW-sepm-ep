@@ -17,34 +17,51 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Validator for diverse owner data structures
+ */
 @Component
 public class OwnerValidator {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private void validateID(List<String> validationErrors, Long id) {
-    if (id == null) {
-      validationErrors.add("No ID given");
-    }
-  }
+  /**
+   * validates an owner's name
+   * - must not be null
+   * - must not whitespace
+   * - must not be longer than 255 chars
+   *
+   * @param validationErrors errors to append
+   * @param name             the owner's name
+   * @param nameType         first/last name
+   */
+  private void validateName(List<String> validationErrors, String name, String nameType) {
+    LOG.trace("validateName({}, {}, {})", validationErrors, name, nameType);
 
-  private void validateName(List<String> validationErrors, String name, String nametype) {
     if (name != null) {
       if (name.isBlank()) {
-        validationErrors.add("Owner " + nametype + " is given but blank");
+        validationErrors.add("Owner " + nameType + " is given but blank");
       }
       if (name.length() > 255) {
-        validationErrors.add("Owner " + nametype + " too long: longer than 255 characters");
+        validationErrors.add("Owner " + nameType + " too long: longer than 255 characters");
       }
     } else {
-      validationErrors.add("Owner " + nametype + " is not set");
+      validationErrors.add("Owner " + nameType + " is not set");
     }
   }
 
+  /**
+   * validates an owner's email
+   * - must not be null
+   * - must not be longer than 255 chars
+   * - must match a common email regex
+   *
+   * @param validationErrors errors to append
+   * @param email            the owner's email
+   */
   private void validateEmail(List<String> validationErrors, String email) {
+    LOG.trace("validateEmail({}, {})", validationErrors, email);
+
     if (email != null) {
-      if (email.isBlank()) {
-        validationErrors.add("Owner email is given but blank");
-      }
       if (email.length() > 255) {
         validationErrors.add("Owner email too long: longer than 255 characters");
       }
@@ -61,8 +78,15 @@ public class OwnerValidator {
     }
   }
 
+  /**
+   * validates owner create data for an insert in the persistance
+   *
+   * @param owner the owner create data
+   * @throws ValidationException owner data did not comply all the validations
+   */
   public void validateForInsert(OwnerCreateDto owner) throws ValidationException {
     LOG.trace("validateForInsert({})", owner);
+
     List<String> validationErrors = new ArrayList<>();
 
     validateName(validationErrors, owner.firstName(), "firstname");

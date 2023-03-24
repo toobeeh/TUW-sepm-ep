@@ -19,6 +19,7 @@ public interface HorseService {
   /**
    * Searches for all horses in the system that match a given filter.
    *
+   * @param search the horse filter parameters
    * @return list of all stored horses that match the criteria
    */
   Stream<HorseDetailDto> searchHorses(HorseSearchDto search);
@@ -26,10 +27,13 @@ public interface HorseService {
   /**
    * Get all horses that are ancestors of at max the nth generation of a horse.
    *
+   * @param rootId
+   * @param generations
    * @return a dto that contains a tree of the horses ancestors
+   * @throws NotFoundException   the provided root horse did not exist in the database
+   * @throws ValidationException the provided generations parameter was invalid
    */
   HorseTreeDto getAncestors(long rootId, long generations) throws NotFoundException, ValidationException;
-
 
   /**
    * Updates the horse with the ID given in {@code horse}

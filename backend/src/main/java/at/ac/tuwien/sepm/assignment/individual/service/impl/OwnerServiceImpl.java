@@ -7,6 +7,7 @@ import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepm.assignment.individual.mapper.OwnerMapper;
 import at.ac.tuwien.sepm.assignment.individual.persistence.OwnerDao;
+import at.ac.tuwien.sepm.assignment.individual.service.HorseService;
 import at.ac.tuwien.sepm.assignment.individual.service.OwnerService;
 
 import java.lang.invoke.MethodHandles;
@@ -20,13 +21,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * Owner service implementation according to {@link OwnerService}
+ */
 @Service
 public class OwnerServiceImpl implements OwnerService {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
   private final OwnerDao dao;
   private final OwnerMapper mapper;
-
   private final OwnerValidator validator;
 
   public OwnerServiceImpl(
@@ -41,16 +43,19 @@ public class OwnerServiceImpl implements OwnerService {
   @Override
   public OwnerDto getById(long id) throws NotFoundException {
     LOG.trace("getById({})", id);
+
     return mapper.entityToDto(dao.getById(id));
   }
 
   @Override
   public Map<Long, OwnerDto> getAllById(Collection<Long> ids) throws NotFoundException {
     LOG.trace("getAllById({})", ids);
+
     Map<Long, OwnerDto> owners =
         dao.getAllById(ids).stream()
             .map(mapper::entityToDto)
             .collect(Collectors.toUnmodifiableMap(OwnerDto::id, Function.identity()));
+
     for (final var id : ids) {
       if (!owners.containsKey(id)) {
         throw new NotFoundException("Owner with ID %d not found".formatted(id));
@@ -62,6 +67,7 @@ public class OwnerServiceImpl implements OwnerService {
   @Override
   public Stream<OwnerDto> search(OwnerSearchDto searchParameters) {
     LOG.trace("search({})", searchParameters);
+
     return dao.search(searchParameters).stream()
         .map(mapper::entityToDto);
   }
@@ -69,6 +75,7 @@ public class OwnerServiceImpl implements OwnerService {
   @Override
   public OwnerDto create(OwnerCreateDto newOwner) throws ValidationException {
     LOG.trace("create({})", newOwner);
+
     validator.validateForInsert(newOwner);
     return mapper.entityToDto(dao.create(newOwner));
   }

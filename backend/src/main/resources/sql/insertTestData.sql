@@ -2,6 +2,14 @@
 -- the IDs are hardcoded to enable references between further test data
 -- negative IDs are used to not interfere with user-entered data and allow clean deletion of test data
 
+-- remove old test data, if existing
+DELETE
+FROM owner
+WHERE id < 0;
+DELETE
+FROM horse
+WHERE id < 0;
+
 -- insert owners
 INSERT INTO owner (id, first_name, last_name, email)
 VALUES (-66, 'Obi-Wan', 'Kenobi', 'execute@order.sixtysix'),

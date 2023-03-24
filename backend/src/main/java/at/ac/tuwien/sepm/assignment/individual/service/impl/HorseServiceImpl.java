@@ -30,6 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * Horse service implementation according to {@link HorseService}
+ */
 @Service
 public class HorseServiceImpl implements HorseService {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -47,21 +50,22 @@ public class HorseServiceImpl implements HorseService {
 
   @Override
   public Stream<HorseDetailDto> searchHorses(HorseSearchDto search) {
-    LOG.trace("searchHorses()");
+    LOG.trace("searchHorses({})", search);
 
     // search need not be validated: sex & date validated by parser;
-
     var horses = dao.searchAll(search);
     var ownerIds = horses.stream()
         .map(Horse::getOwnerId)
         .filter(Objects::nonNull)
         .collect(Collectors.toUnmodifiableSet());
     Map<Long, OwnerDto> ownerMap;
+
     try {
       ownerMap = ownerService.getAllById(ownerIds);
     } catch (NotFoundException e) {
       throw new FatalException("Horse, that is already persisted, refers to non-existing owner", e);
     }
+
     return horses.stream()
         .map(horse -> mapper.entityToDetailDto(horse, ownerMap));
   }
@@ -70,8 +74,8 @@ public class HorseServiceImpl implements HorseService {
   public HorseTreeDto getAncestors(long rootId, long generations) throws NotFoundException, ValidationException {
     LOG.trace("getAncestors({},{})", rootId, generations);
 
-    // validate params
-    validator.validateForSearch(rootId, generations);
+    // validate ancestor params
+    validator.validateForAncestorSearch(rootId, generations);
 
     // map horses and get root horse
     var ancestors = dao.getAncestors(rootId, generations);
@@ -81,6 +85,7 @@ public class HorseServiceImpl implements HorseService {
       throw new FatalException("Horse ancestors didnt include horse itself");
     }
 
+    // map ancestors recursively
     return mapper.findAncestors(root.get(), pool);
   }
 
@@ -96,12 +101,14 @@ public class HorseServiceImpl implements HorseService {
     var fatherDto = father == null ? null : mapper.entityToDetailDto(father, ownerMapForSingleId(father.getOwnerId()));
     var motherDto = mother == null ? null : mapper.entityToDetailDto(mother, ownerMapForSingleId(mother.getOwnerId()));
     validator.validateForUpdate(simpleHorse, fatherDto, motherDto);
+
     var updatedHorse = dao.update(horse);
 
+    // return as single entity with parents
+    var ownerIds = Arrays.asList(updatedHorse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId());
     return mapper.entityToChildDetailDto(
         updatedHorse,
-        ownerMapForMultipleId(
-            Arrays.asList(updatedHorse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId())),
+        ownerMapForMultipleId(ownerIds),
         father,
         mother);
   }
@@ -119,10 +126,11 @@ public class HorseServiceImpl implements HorseService {
 
     var createdHorse = dao.create(horse);
 
+    // return as single entity with parents
+    var ownerIds = Arrays.asList(createdHorse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId());
     return mapper.entityToChildDetailDto(
         createdHorse,
-        ownerMapForMultipleId(
-            Arrays.asList(createdHorse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId())),
+        ownerMapForMultipleId(ownerIds),
         father,
         mother
     );
@@ -136,10 +144,11 @@ public class HorseServiceImpl implements HorseService {
     var father = horse.getFatherId() == null ? null : dao.getById(horse.getFatherId());
     var mother = horse.getMotherId() == null ? null : dao.getById(horse.getMotherId());
 
+    // return as single entity with parents
+    var ownerIds = Arrays.asList(horse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId());
     return mapper.entityToChildDetailDto(
         horse,
-        ownerMapForMultipleId(
-            Arrays.asList(horse.getOwnerId(), father == null ? null : father.getOwnerId(), mother == null ? null : mother.getOwnerId())),
+        ownerMapForMultipleId(ownerIds),
         father,
         mother);
   }
@@ -147,11 +156,13 @@ public class HorseServiceImpl implements HorseService {
   @Override
   public void delete(long id) throws NotFoundException {
     LOG.trace("delete({})", id);
+
     dao.delete(id);
   }
 
-
   private Map<Long, OwnerDto> ownerMapForSingleId(Long ownerId) {
+    LOG.trace("ownerMapForSingleId({})", ownerId);
+
     try {
       return ownerId == null
           ? null
@@ -162,6 +173,8 @@ public class HorseServiceImpl implements HorseService {
   }
 
   private Map<Long, OwnerDto> ownerMapForMultipleId(Collection<Long> ownerIds) {
+    LOG.trace("ownerMapForMultipleId({})", ownerIds);
+
     ownerIds = ownerIds.stream().filter(id -> id != null).toList();
     try {
       return ownerIds == null

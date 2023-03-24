@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -13,6 +14,7 @@ import java.util.stream.Stream;
  * Service for working with owners.
  */
 public interface OwnerService {
+
   /**
    * Fetch an owner from the persistent data store by its ID.
    *
@@ -25,7 +27,7 @@ public interface OwnerService {
   /**
    * Fetch all owners referenced by the IDs in {@code ids}
    *
-   * @param ids the IDs of the owners, that shoud be fetched
+   * @param ids the IDs of the owners, that should be fetched
    * @return a map that contains the requested owners with their IDs as key
    * @throws NotFoundException if any of the requested owners is not found
    */
@@ -36,7 +38,7 @@ public interface OwnerService {
    * <p>
    * A owner is considered matched, if its name contains {@code searchParameters.name} as a substring.
    * The returned stream of owners never contains more than {@code searchParameters.maxAmount} elements,
-   *  even if there would be more matches in the persistent data store.
+   * even if there would be more matches in the persistent data store.
    * </p>
    *
    * @param searchParameters object containing the search parameters to match
