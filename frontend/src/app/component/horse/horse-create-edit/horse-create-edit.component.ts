@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm, NgModel } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { map, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Horse } from 'src/app/dto/horse';
 import { Owner } from 'src/app/dto/owner';
 import { Sex } from 'src/app/dto/sex';
