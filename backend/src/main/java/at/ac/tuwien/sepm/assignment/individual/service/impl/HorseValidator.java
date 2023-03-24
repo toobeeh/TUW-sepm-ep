@@ -237,5 +237,4 @@ public class HorseValidator {
       throw new ValidationException("Validation of horse for create failed", validationErrors);
     }
   }
-
 }

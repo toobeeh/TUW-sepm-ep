@@ -16,27 +16,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper for diverse horse data structures between DTO and DAO
+ */
 @Component
 public class HorseMapper {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-  public HorseMapper() {
-  }
 
   /**
    * Convert a horse entity object to a {@link HorseTreeDto} and include all its ancestors from a pool.
    *
    * @param root the horse at the bottom of the family tree
-   * @param pool a pool of possible ancestor horses. to find ancestors of the parents, the parents are not removed since the family tree could contain more complex inheritance lines.
+   * @param pool a pool of possible ancestor horses. to find ancestors of the parents,
+   *             the parents are not removed since the family tree could contain more complex inheritance lines.
    * @return the converted {@link HorseTreeDto}
    */
   public HorseTreeDto findAncestors(Horse root, Supplier<Stream<Horse>> pool) {
+    LOG.trace("findAncestors({}, {})", root, pool);
+
+    // find parents from pool
     var father = pool.get().filter(hors -> hors.getId() == root.getFatherId()).findFirst();
     var mother = pool.get().filter(hors -> hors.getId() == root.getMotherId()).findFirst();
 
+    // map parents recursively
     var fatherDto = father.isEmpty() ? null : findAncestors(father.get(), pool);
     var motherDto = mother.isEmpty() ? null : findAncestors(mother.get(), pool);
 
+    // return child with parents
     return new HorseTreeDto(
         root.getId(),
         root.getName(),
@@ -59,10 +65,10 @@ public class HorseMapper {
       Horse horse,
       Map<Long, OwnerDto> owners) {
     LOG.trace("entityToDetailDto({})", horse);
+
     if (horse == null) {
       return null;
     }
-
 
     return new HorseDetailDto(
         horse.getId(),
@@ -89,7 +95,8 @@ public class HorseMapper {
       Map<Long, OwnerDto> owners,
       Horse father,
       Horse mother) {
-    LOG.trace("entityToChildDetailDto({})", horse);
+    LOG.trace("entityToChildDetailDto({}, {}, {}, {})", horse, owners, father, mother);
+
     if (horse == null) {
       return null;
     }
@@ -106,7 +113,16 @@ public class HorseMapper {
     );
   }
 
+  /**
+   * Gets the owner dto for a horse out of a pool of owners
+   *
+   * @param horse  the horse to match to
+   * @param owners the pool of available owners
+   * @return the matching owner dto
+   */
   private OwnerDto getOwner(Horse horse, Map<Long, OwnerDto> owners) {
+    LOG.trace("getOwner({}, {})", horse, owners);
+
     OwnerDto owner = null;
     var ownerId = horse.getOwnerId();
     if (ownerId != null) {
@@ -117,5 +133,4 @@ public class HorseMapper {
     }
     return owner;
   }
-
 }
