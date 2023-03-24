@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ApplicationExceptionHandler {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+  /**
+   * Exception handler for validation exceptions
+   *
+   * @param e the caught validation exception
+   * @return a dto with an appropriate message for the frontend
+   */
   @ExceptionHandler
   @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
   @ResponseBody
@@ -26,6 +32,12 @@ public class ApplicationExceptionHandler {
     return new ValidationErrorRestDto(e.summary(), e.errors());
   }
 
+  /**
+   * Exception handler for not found exceptions
+   *
+   * @param e the caught not found exception
+   * @return a dto with an appropriate message for the frontend
+   */
   @ExceptionHandler
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
@@ -34,6 +46,12 @@ public class ApplicationExceptionHandler {
     return new NotFoundErrorRestDto(e.getMessage());
   }
 
+  /**
+   * Exception handler for conflict exceptions
+   *
+   * @param e the caught conflict exception
+   * @return a dto with an appropriate message for the frontend
+   */
   @ExceptionHandler
   @ResponseStatus(HttpStatus.CONFLICT)
   @ResponseBody

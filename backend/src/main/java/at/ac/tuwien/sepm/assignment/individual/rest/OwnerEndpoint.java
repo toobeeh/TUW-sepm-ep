@@ -63,5 +63,4 @@ public class OwnerEndpoint {
     LOG.debug("Request body:\n{}", toCreate);
     return service.create(toCreate);
   }
-
 }
