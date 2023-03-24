@@ -8,8 +8,7 @@ import {
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { debounce, debounceTime, map, of, Subject, Subscription } from 'rxjs';
-import { Sex } from 'src/app/dto/sex';
+import { debounceTime, map, of, Subscription } from 'rxjs';
 import { HorseService } from 'src/app/service/horse.service';
 import { OwnerService } from 'src/app/service/owner.service';
 import { Horse, HorseSearch } from '../../dto/horse';
@@ -105,7 +104,7 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public delete(id: number, horse: Horse): void {
     this.service.delete(id).subscribe({
-      next: (data) => {
+      next: () => {
         this.notification.success(`Horse ${horse.name} successfully deleted.`);
         this.reloadHorses();
       },

@@ -124,7 +124,11 @@
             </a>
             <a
               class="btn btn-sm responsive-danger-button"
-              (click)="delete(horse.id, horse)"
+              (click)="
+                delete(horse.id, horse);
+                $event.preventDefault();
+                $event.stopPropagation()
+              "
               aria-label="Delete horse"
             >
               <i class="bi bi-trash"></i>

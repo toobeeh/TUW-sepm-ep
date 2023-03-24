@@ -6,6 +6,9 @@ import { Horse, HorseSearch, HorseTree } from '../dto/horse';
 
 const baseUri = environment.backendUrl + '/horses';
 
+/**
+ * REST service to access horses from the backend
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -16,13 +19,14 @@ export class HorseService {
   ) { }
 
   /**
-   * Get all horses stored in the system
+   * Search among all horses in the system
    *
-   * @return observable list of found horses.
+   * @param searchData horse search parameters. omit to get all
+   * @return observable of the list of found horses.
    */
   searchAll(searchData: HorseSearch = {}): Observable<Horse[]> {
 
-    /* iterate through object and add params typesafe */
+    /* iterate through object and add params */
     let params = new HttpParams();
     Object.keys(searchData).forEach(key => {
       const objKey = key as keyof HorseSearch;
@@ -36,17 +40,20 @@ export class HorseService {
   }
 
   /**
-   * Get all horses stored in the system
+   * Get a horse by id
    *
-   * @return observable list of found horses.
+   * @param id the id of the horse to get
+   * @return observable of the found horse
    */
   get(id: number): Observable<Horse> {
     return this.http.get<Horse>(`${baseUri}/${id}`);
   }
 
   /**
-   * Get all horses stored in the system
+   * Get all ancestors to a nth degree of a single horse
    *
+   * @param id the horse to get the ancestors from
+   * @param generations the maximum "hops" of generations from the root horse
    * @return observable list of found horses.
    */
   getAncestors(id: number, generations: number): Observable<HorseTree> {
@@ -90,5 +97,4 @@ export class HorseService {
       `${baseUri}/${id}`
     );
   }
-
 }

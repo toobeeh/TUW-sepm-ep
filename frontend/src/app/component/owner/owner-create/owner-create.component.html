@@ -83,7 +83,6 @@
             [class]="dynamicCssClassesForInput(ownerEmailModel)"
             [(ngModel)]="owner.email"
             #ownerEmailModel="ngModel"
-            required
             pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
           />
           <div class="invalid-feedback">

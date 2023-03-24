@@ -16,15 +16,14 @@ export class OwnerCreateComponent {
   owner: Owner = {
     firstName: '',
     lastName: '',
-    email: '',
+    email: undefined,
   };
 
   constructor(
     private ownerService: OwnerService,
     private router: Router,
-    private route: ActivatedRoute,
     private notification: ToastrService
-  ) {}
+  ) { }
 
   public dynamicCssClassesForInput(input: NgModel): any {
     return {
