@@ -35,12 +35,12 @@ public class HorseMapper {
     LOG.trace("findAncestors({}, {})", root, pool);
 
     // find parents from pool
-    var father = pool.get().filter(hors -> hors.getId() == root.getFatherId()).findFirst();
-    var mother = pool.get().filter(hors -> hors.getId() == root.getMotherId()).findFirst();
+    var father = pool.get().filter(hors -> hors.getId().equals(root.getFatherId())).findFirst();
+    var mother = pool.get().filter(hors -> hors.getId().equals(root.getMotherId())).findFirst();
 
     // map parents recursively
-    var fatherDto = father.isEmpty() ? null : findAncestors(father.get(), pool);
-    var motherDto = mother.isEmpty() ? null : findAncestors(mother.get(), pool);
+    var fatherDto = father.map(value -> findAncestors(value, pool)).orElse(null);
+    var motherDto = mother.map(horse -> findAncestors(horse, pool)).orElse(null);
 
     // return child with parents
     return new HorseTreeDto(

@@ -79,7 +79,7 @@ public class HorseServiceImpl implements HorseService {
 
     // map horses and get root horse
     var ancestors = dao.getAncestors(rootId, generations);
-    Supplier<Stream<Horse>> pool = () -> ancestors.stream();
+    Supplier<Stream<Horse>> pool = ancestors::stream;
     var root = pool.get().filter(hors -> hors.getId() == rootId).findFirst();
     if (root.isEmpty()) {
       throw new FatalException("Horse ancestors didnt include horse itself");
@@ -175,14 +175,14 @@ public class HorseServiceImpl implements HorseService {
   private Map<Long, OwnerDto> ownerMapForMultipleId(Collection<Long> ownerIds) {
     LOG.trace("ownerMapForMultipleId({})", ownerIds);
 
-    ownerIds = ownerIds.stream().filter(id -> id != null).toList();
+    ownerIds = ownerIds.stream().filter(Objects::nonNull).toList();
     try {
       return ownerIds == null
           ? null
           : ownerService.getAllById(ownerIds);
     } catch (NotFoundException e) {
-      throw new FatalException("One of owners %d referenced by horse not found"
-          .formatted(ownerIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))));
+      throw new FatalException("One of owners %s referenced by horse not found"
+          .formatted(ownerIds.stream().map(Object::toString).collect(Collectors.joining(","))));
     }
   }
 

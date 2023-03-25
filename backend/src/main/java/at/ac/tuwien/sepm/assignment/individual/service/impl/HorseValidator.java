@@ -130,10 +130,10 @@ public class HorseValidator {
   private void validateParents(List<String> validationErrors, HorseDetailDto father, HorseDetailDto mother, LocalDate childBirth, Long childId) {
     LOG.trace("validateParents({}, {}, {}, {}, {})", validationErrors, father, mother, childBirth, childId);
 
-    if (mother != null && mother.id() == childId) {
+    if (mother != null && mother.id().equals(childId)) {
       validationErrors.add("Mother horse is the same as child");
     }
-    if (father != null && father.id() == childId) {
+    if (father != null && father.id().equals(childId)) {
       validationErrors.add("Father horse is the same as child");
     }
     if (mother != null && mother.sex() != Sex.FEMALE) {
@@ -228,8 +228,7 @@ public class HorseValidator {
     }
     if (generations == null) {
       validationErrors.add("Ancestor generations is not given");
-    }
-    if (generations <= 0) {
+    } else if (generations <= 0) {
       validationErrors.add("Ancestor generations have to be bigger than 1");
     }
 
