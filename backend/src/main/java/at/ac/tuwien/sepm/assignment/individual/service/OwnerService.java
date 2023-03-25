@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.assignment.individual.service;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerSearchDto;
+import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 
@@ -53,5 +54,5 @@ public interface OwnerService {
    * @return the owner, that was just newly created in the persistent data store
    * @throws ValidationException if the
    */
-  OwnerDto create(OwnerCreateDto newOwner) throws ValidationException;
+  OwnerDto create(OwnerCreateDto newOwner) throws ValidationException, ConflictException;
 }

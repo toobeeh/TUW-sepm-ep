@@ -22,6 +22,14 @@ public interface OwnerDao {
   Owner getById(long id) throws NotFoundException;
 
   /**
+   * Checks if an email is already used by another user.
+   *
+   * @param email the email to check for
+   * @return true if the email is already used by another user
+   */
+  boolean emailIsTaken(String email);
+
+  /**
    * Fetch a set of owners by their IDs from the persistent data store.
    * This is the best effort, if some owner can not be found in the data store, it is simply not in the returned set.
    *

@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.assignment.individual.service.impl;
 
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerCreateDto;
+import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +69,6 @@ public class OwnerValidator {
       if (!matcher.matches()) {
         validationErrors.add("Owner email is not in a valid format");
       }
-    } else {
-      validationErrors.add("Owner email is not set");
     }
   }
 
@@ -79,7 +78,7 @@ public class OwnerValidator {
    * @param owner the owner create data
    * @throws ValidationException owner data did not comply all the validations
    */
-  public void validateForInsert(OwnerCreateDto owner) throws ValidationException {
+  public void validateForInsert(OwnerCreateDto owner, boolean emailIsTaken) throws ValidationException, ConflictException {
     LOG.trace("validateForInsert({})", owner);
 
     List<String> validationErrors = new ArrayList<>();
@@ -89,6 +88,10 @@ public class OwnerValidator {
     validateEmail(validationErrors, owner.email());
     if (!validationErrors.isEmpty()) {
       throw new ValidationException("Validation of owner for create failed", validationErrors);
+    }
+
+    if (emailIsTaken) {
+      throw new ConflictException("Data of owner for create has conflicts", List.of("Owner email is already taken"));
     }
   }
 

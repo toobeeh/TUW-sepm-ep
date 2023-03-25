@@ -32,6 +32,7 @@ public class OwnerJdbcDao implements OwnerDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final String TABLE_NAME = "owner";
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+  private static final String SQL_SELECT_BY_EMAIL = "SELECT * FROM " + TABLE_NAME + " WHERE email = ?";
   private static final String SQL_SELECT_ALL = "SELECT * FROM " + TABLE_NAME + " WHERE id IN (:ids)";
   private static final String SQL_CREATE = "INSERT INTO " + TABLE_NAME + " (first_name, last_name, email) VALUES (?, ?, ?)";
   private final JdbcTemplate jdbcTemplate;
@@ -56,6 +57,21 @@ public class OwnerJdbcDao implements OwnerDao {
     }
 
     return owners.get(0);
+  }
+
+  @Override
+  public boolean emailIsTaken(String email) {
+    LOG.trace("emailIsTaken({})", email);
+
+    // null is always allowed
+    if (email == null) return false;
+
+    List<Owner> owners = jdbcTemplate.query(SQL_SELECT_BY_EMAIL, this::mapRow, email);
+    if (owners.isEmpty()) {
+      return false;
+    }
+
+    return true;
   }
 
   @Override

@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.assignment.individual.rest;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerCreateDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerDto;
 import at.ac.tuwien.sepm.assignment.individual.dto.OwnerSearchDto;
+import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepm.assignment.individual.service.OwnerService;
 
@@ -54,7 +55,7 @@ public class OwnerEndpoint {
    * @throws ValidationException the provided data for the new owner was invalid
    */
   @PostMapping()
-  public OwnerDto create(@RequestBody OwnerCreateDto toCreate) throws ValidationException {
+  public OwnerDto create(@RequestBody OwnerCreateDto toCreate) throws ValidationException, ConflictException {
     LOG.info("POST " + BASE_PATH);
     LOG.debug("Request body:\n{}", toCreate);
     return service.create(toCreate);
