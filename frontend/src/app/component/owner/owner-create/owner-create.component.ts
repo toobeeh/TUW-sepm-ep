@@ -36,7 +36,11 @@ export class OwnerCreateComponent {
   public onSubmit(form: NgForm): void {
     console.log('is form valid?', form.valid, this.owner);
     if (form.valid) {
-      const observable = this.ownerService.create(this.owner);
+      const owner = { ...this.owner };
+      if (owner.email === '') {
+        delete owner.email;
+      }
+      const observable = this.ownerService.create(owner);
       observable.subscribe({
         next: (data) => {
           this.notification.success(
