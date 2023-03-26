@@ -51,6 +51,9 @@ export class OwnerCreateComponent {
         error: (response: HttpErrorResponse) => {
           let message: string;
           switch (response.status) {
+            case 400:
+              message = 'The data for the new owner contained unexpected values.';
+              break;
             case 422:
               message = response.error.errors.join(', ');
               break;
