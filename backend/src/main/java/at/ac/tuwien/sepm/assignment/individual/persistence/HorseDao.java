@@ -24,6 +24,8 @@ public interface HorseDao {
   /**
    * Get all horses that are ancestors of at max the nth generation of a horse.
    *
+   * @param generations the maximum amount of generation-steps, must not be negative
+   * @param rootId      the id of the horse with generation 0
    * @return a list of all stored horses that are ancestors
    * @throws NotFoundException the root horse could not be found
    */

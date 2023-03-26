@@ -140,6 +140,7 @@ public class HorseJdbcDao implements HorseDao {
     return horses.get(0);
   }
 
+  @Override
   public List<Horse> getAncestors(long rootId, long generations) throws NotFoundException {
     LOG.trace("getAncestors({},{})", rootId, generations);
 
