@@ -28,7 +28,7 @@ public interface HorseService {
    * Get all horses that are ancestors of at max the nth generation of a horse.
    *
    * @param rootId      the horse id where to start the tree
-   * @param generations the max allowed generation to search for
+   * @param generations the max allowed generation to search for; must be bigger or equal than 0
    * @return a dto that contains a tree of the horses ancestors
    * @throws NotFoundException   the provided root horse did not exist in the database
    * @throws ValidationException the provided generations parameter was invalid

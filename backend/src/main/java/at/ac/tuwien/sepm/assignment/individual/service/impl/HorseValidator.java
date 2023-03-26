@@ -226,8 +226,8 @@ public class HorseValidator {
     }
     if (generations == null) {
       validationErrors.add("Ancestor generations is not given");
-    } else if (generations <= 0) {
-      validationErrors.add("Ancestor generations have to be bigger than 1");
+    } else if (generations < 0) {
+      validationErrors.add("Ancestor generations must not be negative");
     }
 
     if (!validationErrors.isEmpty()) {

@@ -38,7 +38,7 @@ public class HorseJdbcDao implements HorseDao {
   private static final String SQL_SELECT_BY_PARENT_ID = "SELECT * FROM " + TABLE_NAME + " WHERE father_id = ? OR mother_id = ?";
   private static final String SQL_GET_NTH_GEN_ANCESTORS = "SELECT *  FROM horse WHERE id IN ("
       + " WITH ancestors (id, name, mother_id, father_id, generation) AS ("
-      + " SELECT id, name, father_id, mother_id, 1 AS generation"
+      + " SELECT id, name, father_id, mother_id, 0 AS generation"
       + " FROM " + TABLE_NAME
       + " WHERE id = ?"
       + " UNION ALL"
