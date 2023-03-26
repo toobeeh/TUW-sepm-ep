@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -104,11 +105,16 @@ public class HorseJdbcDao implements HorseDao {
       sqlParams.addValue("limit", searchFilter.limit());
     }
 
-    horses = namedJdbcTemplate.query(
-        sql,
-        sqlParams,
-        this::mapRow
-    );
+    try {
+      horses = namedJdbcTemplate.query(
+          sql,
+          sqlParams,
+          this::mapRow
+      );
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
+
     return horses;
   }
 
@@ -117,7 +123,11 @@ public class HorseJdbcDao implements HorseDao {
     LOG.trace("getById({})", id);
 
     List<Horse> horses;
-    horses = jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, id);
+    try {
+      horses = jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, id);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
 
     if (horses.isEmpty()) {
       throw new NotFoundException("No horse with ID %d found".formatted(id));
@@ -134,7 +144,11 @@ public class HorseJdbcDao implements HorseDao {
     LOG.trace("getAncestors({},{})", rootId, generations);
 
     List<Horse> ancestors;
-    ancestors = jdbcTemplate.query(SQL_GET_NTH_GEN_ANCESTORS, this::mapRow, rootId, generations);
+    try {
+      ancestors = jdbcTemplate.query(SQL_GET_NTH_GEN_ANCESTORS, this::mapRow, rootId, generations);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
 
     if (ancestors.isEmpty()) {
       throw new NotFoundException("No horse with ID %d found".formatted(rootId));
@@ -148,7 +162,11 @@ public class HorseJdbcDao implements HorseDao {
     LOG.trace("isParent({})", horseId);
 
     List<Horse> horses;
-    horses = jdbcTemplate.query(SQL_SELECT_BY_PARENT_ID, this::mapRow, horseId, horseId);
+    try {
+      horses = jdbcTemplate.query(SQL_SELECT_BY_PARENT_ID, this::mapRow, horseId, horseId);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
 
     if (horses.isEmpty()) {
       return false;
@@ -161,7 +179,12 @@ public class HorseJdbcDao implements HorseDao {
   public void delete(long id) throws NotFoundException {
     LOG.trace("delete({})", id);
 
-    int updated = jdbcTemplate.update(SQL_DELETE, id);
+    int updated;
+    try {
+      updated = jdbcTemplate.update(SQL_DELETE, id);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
 
     if (updated == 0) {
       throw new NotFoundException("Could not delete horse with ID " + id + ", because it does not exist");
@@ -172,15 +195,21 @@ public class HorseJdbcDao implements HorseDao {
   public Horse update(HorseChildDetailDto horse) throws NotFoundException {
     LOG.trace("update({})", horse);
 
-    int updated = jdbcTemplate.update(SQL_UPDATE,
-        horse.name(),
-        horse.description(),
-        horse.dateOfBirth(),
-        horse.sex().toString(),
-        horse.ownerId(),
-        horse.fatherId(),
-        horse.motherId(),
-        horse.id());
+    int updated;
+    try {
+      updated = jdbcTemplate.update(SQL_UPDATE,
+          horse.name(),
+          horse.description(),
+          horse.dateOfBirth(),
+          horse.sex().toString(),
+          horse.ownerId(),
+          horse.fatherId(),
+          horse.motherId(),
+          horse.id());
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
+
     if (updated == 0) {
       throw new NotFoundException("Could not update horse with ID " + horse.id() + ", because it does not exist");
     }
@@ -201,18 +230,23 @@ public class HorseJdbcDao implements HorseDao {
     LOG.trace("create({})", horse);
 
     GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-    jdbcTemplate.update(con -> {
-      PreparedStatement stmt = con.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
-      stmt.setString(1, horse.name());
-      stmt.setString(2, horse.description());
-      stmt.setDate(3, Date.valueOf(horse.dateOfBirth()));
-      stmt.setString(4, horse.sex().name());
-      stmt.setObject(5, horse.ownerId());
-      stmt.setObject(6, horse.fatherId());
-      stmt.setObject(7, horse.motherId());
 
-      return stmt;
-    }, keyHolder);
+    try {
+      jdbcTemplate.update(con -> {
+        PreparedStatement stmt = con.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
+        stmt.setString(1, horse.name());
+        stmt.setString(2, horse.description());
+        stmt.setDate(3, Date.valueOf(horse.dateOfBirth()));
+        stmt.setString(4, horse.sex().name());
+        stmt.setObject(5, horse.ownerId());
+        stmt.setObject(6, horse.fatherId());
+        stmt.setObject(7, horse.motherId());
+
+        return stmt;
+      }, keyHolder);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
 
     Number key = keyHolder.getKey();
     if (key == null) {

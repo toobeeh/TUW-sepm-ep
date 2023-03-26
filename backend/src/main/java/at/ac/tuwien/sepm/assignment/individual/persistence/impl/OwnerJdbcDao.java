@@ -8,6 +8,7 @@ import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.persistence.OwnerDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -47,7 +48,14 @@ public class OwnerJdbcDao implements OwnerDao {
   public Owner getById(long id) throws NotFoundException {
     LOG.trace("getById({})", id);
 
-    List<Owner> owners = jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, id);
+    List<Owner> owners;
+
+    try {
+      owners = jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, id);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
+
     if (owners.isEmpty()) {
       throw new NotFoundException("Owner with ID %d not found".formatted(id));
     }
@@ -66,7 +74,14 @@ public class OwnerJdbcDao implements OwnerDao {
     // null is always allowed
     if (email == null) return false;
 
-    List<Owner> owners = jdbcTemplate.query(SQL_SELECT_BY_EMAIL, this::mapRow, email);
+    List<Owner> owners;
+
+    try {
+      owners = jdbcTemplate.query(SQL_SELECT_BY_EMAIL, this::mapRow, email);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
+
     if (owners.isEmpty()) {
       return false;
     }
@@ -79,13 +94,18 @@ public class OwnerJdbcDao implements OwnerDao {
     LOG.trace("create({})", newOwner);
 
     GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-    jdbcTemplate.update(con -> {
-      PreparedStatement stmt = con.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
-      stmt.setString(1, newOwner.firstName());
-      stmt.setString(2, newOwner.lastName());
-      stmt.setString(3, newOwner.email());
-      return stmt;
-    }, keyHolder);
+
+    try {
+      jdbcTemplate.update(con -> {
+        PreparedStatement stmt = con.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
+        stmt.setString(1, newOwner.firstName());
+        stmt.setString(2, newOwner.lastName());
+        stmt.setString(3, newOwner.email());
+        return stmt;
+      }, keyHolder);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
 
     Number key = keyHolder.getKey();
     if (key == null) {
@@ -106,7 +126,15 @@ public class OwnerJdbcDao implements OwnerDao {
     LOG.trace("getAllById({})", ids);
 
     var statementParams = Collections.singletonMap("ids", ids);
-    return jdbcNamed.query(SQL_SELECT_ALL, statementParams, this::mapRow);
+    List<Owner> owners;
+
+    try {
+      owners = jdbcNamed.query(SQL_SELECT_ALL, statementParams, this::mapRow);
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
+
+    return owners;
   }
 
   @Override
@@ -128,11 +156,15 @@ public class OwnerJdbcDao implements OwnerDao {
       sqlParams.addValue("limit", searchParameters.maxAmount());
     }
 
-    owners = jdbcNamed.query(
-        sql,
-        sqlParams,
-        this::mapRow
-    );
+    try {
+      owners = jdbcNamed.query(
+          sql,
+          sqlParams,
+          this::mapRow
+      );
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
 
     return owners;
   }
