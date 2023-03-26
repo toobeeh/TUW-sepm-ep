@@ -1,11 +1,11 @@
 package at.ac.tuwien.sepm.assignment.individual.rest;
 
 /**
- * Error DTO to contain a not found exception
+ * Error DTO to contain a fatal exception
  *
  * @param message the error summary
  */
-public record NotFoundErrorRestDto(
+public record InternalServerErrorRestDto(
     String message
 ) {
 }

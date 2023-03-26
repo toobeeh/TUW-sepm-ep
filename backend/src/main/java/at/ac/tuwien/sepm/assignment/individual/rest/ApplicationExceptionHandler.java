@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.assignment.individual.rest;
 
 import at.ac.tuwien.sepm.assignment.individual.exception.ConflictException;
+import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepm.assignment.individual.exception.ValidationException;
 
@@ -58,5 +59,19 @@ public class ApplicationExceptionHandler {
   public ConflictErrorRestDto handleConflictException(ConflictException e) {
     LOG.warn("Terminating request processing with status 409 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
     return new ConflictErrorRestDto(e.summary(), e.errors());
+  }
+
+  /**
+   * Exception handler for fatal exceptions
+   *
+   * @param e the caught fatal exception
+   * @return a dto with an appropriate message for the frontend
+   */
+  @ExceptionHandler
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseBody
+  public InternalServerErrorRestDto handleFatalException(FatalException e) {
+    LOG.warn("Terminating request processing with status 500 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
+    return new InternalServerErrorRestDto(e.getMessage());
   }
 }
