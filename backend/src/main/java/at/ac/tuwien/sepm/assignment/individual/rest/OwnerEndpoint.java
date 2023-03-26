@@ -12,10 +12,12 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,6 +43,7 @@ public class OwnerEndpoint {
    * @return a list of owners with their common properties
    */
   @GetMapping
+  @ResponseStatus(HttpStatus.OK)
   public Stream<OwnerDto> search(OwnerSearchDto searchParameters) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("Request query parameters: {}", searchParameters);
@@ -55,6 +58,7 @@ public class OwnerEndpoint {
    * @throws ValidationException the provided data for the new owner was invalid
    */
   @PostMapping()
+  @ResponseStatus(HttpStatus.CREATED)
   public OwnerDto create(@RequestBody OwnerCreateDto toCreate) throws ValidationException, ConflictException {
     LOG.info("POST " + BASE_PATH);
     LOG.debug("Request body:\n{}", toCreate);

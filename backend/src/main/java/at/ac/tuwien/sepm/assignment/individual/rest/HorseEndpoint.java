@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -48,6 +50,7 @@ public class HorseEndpoint {
    * @return a list of horses with their common properties; without parent information
    */
   @GetMapping
+  @ResponseStatus(HttpStatus.OK)
   public Stream<HorseDetailDto> search(HorseSearchDto searchParameters) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("Request query parameters: {}", searchParameters);
@@ -62,6 +65,7 @@ public class HorseEndpoint {
    * @throws NotFoundException the horse id could not be found in the database
    */
   @GetMapping("{id}")
+  @ResponseStatus(HttpStatus.OK)
   public HorseChildDetailDto getById(@PathVariable long id) throws NotFoundException {
     LOG.info("GET " + BASE_PATH + "/{}", id);
     return service.getById(id);
@@ -77,6 +81,7 @@ public class HorseEndpoint {
    * @throws ValidationException input parameters like generation were invalid
    */
   @GetMapping("ancestors/{id}")
+  @ResponseStatus(HttpStatus.OK)
   public HorseTreeDto getAncestors(@PathVariable Long id, HorseGenerationsDto generationParameters) throws NotFoundException, ValidationException {
     LOG.info("GET " + BASE_PATH + "/ancestors/{}", id);
     LOG.debug("Request query parameters: {}", generationParameters);
@@ -94,6 +99,7 @@ public class HorseEndpoint {
    * @throws NotFoundException   the horse to update or its owner could not be found
    */
   @PutMapping("{id}")
+  @ResponseStatus(HttpStatus.OK)
   public HorseChildDetailDto update(@PathVariable long id, @RequestBody HorseChildDetailDto toUpdate)
       throws ValidationException, ConflictException, NotFoundException {
     LOG.info("PUT " + BASE_PATH + "/{}", toUpdate);
@@ -111,6 +117,7 @@ public class HorseEndpoint {
    * @throws NotFoundException   the provided owner of the horse could not be found
    */
   @PostMapping()
+  @ResponseStatus(HttpStatus.CREATED)
   public HorseChildDetailDto create(@RequestBody HorseCreateDto toCreate) throws ConflictException, ValidationException, NotFoundException {
     LOG.info("POST " + BASE_PATH);
     LOG.debug("Request body:\n{}", toCreate);
@@ -124,6 +131,7 @@ public class HorseEndpoint {
    * @throws NotFoundException the horse to delete could not be found
    */
   @DeleteMapping("{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable long id) throws NotFoundException {
     LOG.info("DELETE " + BASE_PATH + "/{}", id);
     service.delete(id);
