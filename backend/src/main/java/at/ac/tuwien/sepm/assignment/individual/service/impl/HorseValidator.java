@@ -238,19 +238,18 @@ public class HorseValidator {
   }
 
   /**
-   * validate horse ancestor search data
+   * check for horse sex update conflicts
    *
-   * @param old     the root horse
-   * @param updated the max generation hops, to be bigger than 0
-   * @throws ValidationException the generation param was <= 0 or the id was null
+   * @param old         the horse's sex before the update
+   * @param updated     the horse's sex after the update
+   * @param hasChildren indicator if the horse has any children in the db
+   * @throws ConflictException the horse's gender did change, but it had already children assigned
    */
-  public void validateForSexChange(Sex old, Sex updated, boolean hasChildren) throws ValidationException {
+  public void validateForSexChange(Sex old, Sex updated, boolean hasChildren) throws ConflictException {
     LOG.trace("validateForSexChange({}, {}, {})", old, updated, hasChildren);
 
-    List<String> validationErrors = new ArrayList<>();
-
     if (!old.equals(updated) && hasChildren) {
-      throw new ValidationException("Validation of horse for create failed", List.of("Horse can't change sex, since it has children"));
+      throw new ConflictException("Update of horse caused conflicts", List.of("Horse can't change sex, since it has children"));
     }
   }
 }
