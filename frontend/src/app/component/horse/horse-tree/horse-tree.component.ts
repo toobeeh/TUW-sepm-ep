@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { catchError, Observable, Subject, Subscription } from 'rxjs';
 import { HorseTree } from 'src/app/dto/horse';
 import { FamilytreeService } from 'src/app/service/familytree.service';
 import { HorseService } from 'src/app/service/horse.service';
@@ -71,6 +71,27 @@ export class HorseTreeComponent implements OnInit, OnDestroy {
     if (Number.isNaN(this.id) || this.id === undefined) {
       throw new Error('No horse selected');
     }
-    this.tree$ = this.horses.getAncestors(this.id, this.generations);
+    this.tree$ = this.horses.getAncestors(this.id, this.generations).pipe(catchError((response: HttpErrorResponse) => {
+      let message: string;
+      switch (response.status) {
+        case 400:
+          message = 'The data for the new horse contained unexpected values.';
+          break;
+        case 422:
+          message = response.error.errors.join(', ');
+          break;
+        case 409:
+          message = response.error.errors.join(', ');
+          break;
+        default:
+          message = 'Something went wrong';
+          break;
+      }
+      this.notification.error(
+        `Family tree could not be loaded: \n${message}`
+      );
+      console.error('Error deleting horse', response);
+      throw new Error('Error deleting horse');
+    }));
   }
 }

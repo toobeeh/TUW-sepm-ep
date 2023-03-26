@@ -1,24 +1,26 @@
 <h1 class="display-1 mb-3">Family Tree</h1>
-<div class="d-flex flex-row w-auto">
+<form class="d-flex flex-row w-auto" #form="ngForm">
   <button
     class="btn btn-primary mr-1"
     (click)="getAncestors()"
     aria-label="Load"
+    [disabled]="!form.valid"
   >
     <i class="bi bi-arrow-clockwise"></i>
     Load
   </button>
   <div class="ms-1">
     <input
+      name="generations"
       type="number"
       class="form-control"
       [(ngModel)]="generations"
       placeholder="Ancestor generations"
-      min="1"
+      min="0"
     />
   </div>
   <span style="flex: 1"></span>
-</div>
+</form>
 
 <div class="mt-3 mb-3">
   <app-tree-entry *ngIf="tree$ | async as tree" [horse]="tree"></app-tree-entry>
