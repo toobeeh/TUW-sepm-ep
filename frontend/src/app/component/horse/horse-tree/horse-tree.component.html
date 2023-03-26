@@ -21,9 +21,5 @@
 </div>
 
 <div class="mt-3 mb-3">
-  <app-tree-entry
-    *ngIf="tree$ | async as tree"
-    [horse]="tree"
-    [deleteSubject]="deleteSubject"
-  ></app-tree-entry>
+  <app-tree-entry *ngIf="tree$ | async as tree" [horse]="tree"></app-tree-entry>
 </div>

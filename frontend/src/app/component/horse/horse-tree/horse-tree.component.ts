@@ -1,30 +1,33 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { HorseTree } from 'src/app/dto/horse';
+import { FamilytreeService } from 'src/app/service/familytree.service';
 import { HorseService } from 'src/app/service/horse.service';
 
 @Component({
   selector: 'app-horse-tree',
   templateUrl: './horse-tree.component.html',
-  styleUrls: ['./horse-tree.component.scss']
+  styleUrls: ['./horse-tree.component.scss'],
+  providers: [FamilytreeService]
 })
-export class HorseTreeComponent implements OnInit {
+export class HorseTreeComponent implements OnInit, OnDestroy {
 
-  public deleteSubject = new Subject<HorseTree>();
   public generations = 5;
   public tree$?: Observable<HorseTree>;
   private id?: number;
+  private deleteSubscription: Subscription;
 
   constructor(
     private horses: HorseService,
     private route: ActivatedRoute,
     private router: Router,
-    private notification: ToastrService
+    private notification: ToastrService,
+    familyTree: FamilytreeService
   ) {
-    this.deleteSubject.subscribe(horse => {
+    this.deleteSubscription = familyTree.onDelete(horse => {
       this.horses.delete(horse.id).subscribe({
         next: (data) => {
           this.notification.success(`Horse ${horse.name} successfully deleted.`);
@@ -48,6 +51,10 @@ export class HorseTreeComponent implements OnInit {
         },
       });
     });
+  }
+
+  ngOnDestroy(): void {
+    this.deleteSubscription.unsubscribe();
   }
 
   ngOnInit(): void {

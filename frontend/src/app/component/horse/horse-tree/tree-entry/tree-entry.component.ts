@@ -1,8 +1,9 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HorseTree } from 'src/app/dto/horse';
 import { Sex } from 'src/app/dto/sex';
+import { FamilytreeService } from 'src/app/service/familytree.service';
 
 @Component({
   selector: 'app-tree-entry',
@@ -43,13 +44,11 @@ import { Sex } from 'src/app/dto/sex';
 })
 export class TreeEntryComponent {
 
-  @Input()
-  horse?: HorseTree;
-
-  @Input()
-  deleteSubject?: Subject<HorseTree>;
-
+  private _horse: HorseTree | undefined;
   private expanded = true;
+
+  constructor(private familyTree: FamilytreeService) { }
+
 
   get ngClass() {
     return {
@@ -75,16 +74,22 @@ export class TreeEntryComponent {
     return this.horse === undefined || (this.horse.father == null && this.horse.mother == null);
   }
 
+  // eslint-disable-next-line no-underscore-dangle
+  get horse(): HorseTree | undefined { return this._horse; }
+
+  @Input()
+  set horse(horse: HorseTree | undefined) {
+    // eslint-disable-next-line no-underscore-dangle
+    this._horse = horse;
+    if (horse) { this.expanded = this.familyTree.isExpanded(horse.id); }
+  };
+
   toggle() {
     this.expanded = !this.expanded;
+    if (this.horse) { this.familyTree.setExpanded(this.horse.id, this.expanded); }
   }
 
   delete(horse: HorseTree) {
-    // should never occur
-    if (!this.deleteSubject) {
-      throw new Error('no delete subject passed');
-    }
-    this.deleteSubject.next(horse);
+    this.familyTree.delete(horse);
   }
-
 }
