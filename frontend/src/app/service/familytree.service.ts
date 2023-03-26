@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { Horse, HorseTree } from '../dto/horse';
+import { HorseTree } from '../dto/horse';
 
 /**
  * A service that handles the state of a familytree
