@@ -34,6 +34,7 @@ public class HorseJdbcDao implements HorseDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final String TABLE_NAME = "horse";
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+  private static final String SQL_SELECT_BY_PARENT_ID = "SELECT * FROM " + TABLE_NAME + " WHERE father_id = ? OR mother_id = ?";
   private static final String SQL_GET_NTH_GEN_ANCESTORS = "SELECT *  FROM horse WHERE id IN (" +
       " WITH ancestors (id, name, mother_id, father_id, generation) AS (" +
       " SELECT id, name, father_id, mother_id, 1 AS generation" +
@@ -140,6 +141,20 @@ public class HorseJdbcDao implements HorseDao {
     }
 
     return ancestors;
+  }
+
+  @Override
+  public boolean parentExists(long horseId) {
+    LOG.trace("isParent({})", horseId);
+
+    List<Horse> horses;
+    horses = jdbcTemplate.query(SQL_SELECT_BY_PARENT_ID, this::mapRow, horseId, horseId);
+
+    if (horses.isEmpty()) {
+      return false;
+    }
+
+    return true;
   }
 
   @Override

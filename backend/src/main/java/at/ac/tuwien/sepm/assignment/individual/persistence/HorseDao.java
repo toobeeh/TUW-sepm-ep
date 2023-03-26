@@ -29,6 +29,14 @@ public interface HorseDao {
    */
   List<Horse> getAncestors(long rootId, long generations) throws NotFoundException;
 
+  /**
+   * Check if there is a horse that is a parent with given id
+   * (other horses reference this horse as father or mother)
+   *
+   * @param horseId the horse to check for
+   * @return false if no horse has this id as parent, or there is no horse with such id at all
+   */
+  boolean parentExists(long horseId);
 
   /**
    * Update the horse with the ID given in {@code horse}

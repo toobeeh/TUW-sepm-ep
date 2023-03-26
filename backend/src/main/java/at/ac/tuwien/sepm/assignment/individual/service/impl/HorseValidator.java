@@ -236,4 +236,21 @@ public class HorseValidator {
       throw new ValidationException("Validation of horse for create failed", validationErrors);
     }
   }
+
+  /**
+   * validate horse ancestor search data
+   *
+   * @param old     the root horse
+   * @param updated the max generation hops, to be bigger than 0
+   * @throws ValidationException the generation param was <= 0 or the id was null
+   */
+  public void validateForSexChange(Sex old, Sex updated, boolean hasChildren) throws ValidationException {
+    LOG.trace("validateForSexChange({}, {}, {})", old, updated, hasChildren);
+
+    List<String> validationErrors = new ArrayList<>();
+
+    if (!old.equals(updated) && hasChildren) {
+      throw new ValidationException("Validation of horse for create failed", List.of("Horse can't change sex, since it has children"));
+    }
+  }
 }
