@@ -162,10 +162,8 @@ public class HorseValidator {
   public void validateForUpdate(HorseDetailDto horse, HorseDetailDto father, HorseDetailDto mother) throws ValidationException, ConflictException {
     LOG.trace("validateForUpdate({}, {}, {})", horse, father, mother);
 
-    List<String> validationErrors = new ArrayList<>();
-    List<String> validationConflicts = new ArrayList<>();
-
     // the most reusable way since there is no polymorphism in the DTOs, yuck...
+    List<String> validationErrors = new ArrayList<>();
     validateID(validationErrors, horse.id());
     validateDescription(validationErrors, horse.description());
     validateSex(validationErrors, horse.sex());
@@ -175,6 +173,7 @@ public class HorseValidator {
     }
 
     // check for conflicts if validation passed
+    List<String> validationConflicts = new ArrayList<>();
     validateParents(validationConflicts, father, mother, horse.dateOfBirth(), horse.id());
     if (!validationConflicts.isEmpty()) {
       throw new ConflictException("Data of horse for update has conflicts", validationConflicts);
@@ -182,7 +181,7 @@ public class HorseValidator {
   }
 
   /**
-   * validates a horsedto to be created in the persistance
+   * validates a horsedto to be created in the persistence
    *
    * @param horse  horse create data
    * @param father the created horse's father (not to be updated)
@@ -194,8 +193,6 @@ public class HorseValidator {
     LOG.trace("validateForInsert({}, {}, {})", horse, father, mother);
 
     List<String> validationErrors = new ArrayList<>();
-    List<String> validationConflicts = new ArrayList<>();
-
     validateDescription(validationErrors, horse.description());
     validateSex(validationErrors, horse.sex());
     validateName(validationErrors, horse.name());
@@ -205,6 +202,7 @@ public class HorseValidator {
     }
 
     // check for conflicts if validation passed
+    List<String> validationConflicts = new ArrayList<>();
     validateParents(validationConflicts, father, mother, horse.dateOfBirth(), null);
     if (!validationConflicts.isEmpty()) {
       throw new ConflictException("Data of horse for create has conflicts", validationConflicts);
@@ -216,7 +214,7 @@ public class HorseValidator {
    *
    * @param id          the root horse
    * @param generations the max generation hops, to be bigger than 0
-   * @throws ValidationException the generation param was <= 0 or the id was null
+   * @throws ValidationException the generation param was smaller than 1 or the id was null
    */
   public void validateForAncestorSearch(Long id, Long generations) throws ValidationException {
     LOG.trace("validateForAncestorSearch({}, {})", id, generations);

@@ -72,8 +72,7 @@ public class HorseEndpoint {
    *
    * @param id                   the id of the horse where to start the family tree
    * @param generationParameters the maximum number of generations starting from the child; bigger than 0
-   * @return the horse with its parents. The parents include their parents,
-   * until there are no more or the generation limit has been reached
+   * @return the horse with its parents. The parents include their parents, until there are no more or the generation limit has been reached
    * @throws NotFoundException   the horse id could not be found in the database
    * @throws ValidationException input parameters like generation were invalid
    */

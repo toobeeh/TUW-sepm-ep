@@ -72,7 +72,9 @@ public class OwnerJdbcDao implements OwnerDao {
     LOG.trace("emailIsTaken({})", email);
 
     // null is always allowed
-    if (email == null) return false;
+    if (email == null) {
+      return false;
+    }
 
     List<Owner> owners;
 
