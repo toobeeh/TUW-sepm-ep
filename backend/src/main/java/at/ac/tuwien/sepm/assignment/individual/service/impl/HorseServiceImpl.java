@@ -86,7 +86,7 @@ public class HorseServiceImpl implements HorseService {
     }
 
     // map ancestors recursively
-    return mapper.findAncestors(root.get(), pool);
+    return mapper.findAncestors(root.get(), pool, generations);
   }
 
 

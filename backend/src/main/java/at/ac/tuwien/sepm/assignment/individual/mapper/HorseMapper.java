@@ -9,6 +9,7 @@ import at.ac.tuwien.sepm.assignment.individual.exception.FatalException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -26,21 +27,22 @@ public class HorseMapper {
   /**
    * Convert a horse entity object to a {@link HorseTreeDto} and include all its ancestors from a pool.
    *
-   * @param root the horse at the bottom of the family tree
-   * @param pool a pool of possible ancestor horses. to find ancestors of the parents,
-   *             the parents are not removed since the family tree could contain more complex inheritance lines.
+   * @param root           the horse at the bottom of the family tree
+   * @param pool           a pool of possible ancestor horses. to find ancestors of the parents,
+   *                       the parents are not removed since the family tree could contain more complex inheritance lines.
+   * @param maxGenerations the maximum generations of parents to be found for this child
    * @return the converted {@link HorseTreeDto}
    */
-  public HorseTreeDto findAncestors(Horse root, Supplier<Stream<Horse>> pool) {
+  public HorseTreeDto findAncestors(Horse root, Supplier<Stream<Horse>> pool, long maxGenerations) {
     LOG.trace("findAncestors({}, {})", root, pool);
 
     // find parents from pool
-    var father = pool.get().filter(hors -> hors.getId().equals(root.getFatherId())).findFirst();
-    var mother = pool.get().filter(hors -> hors.getId().equals(root.getMotherId())).findFirst();
+    var father = maxGenerations == 0 ? Optional.<Horse>empty() : pool.get().filter(hors -> hors.getId().equals(root.getFatherId())).findFirst();
+    var mother = maxGenerations == 0 ? Optional.<Horse>empty() : pool.get().filter(hors -> hors.getId().equals(root.getMotherId())).findFirst();
 
     // map parents recursively
-    var fatherDto = father.map(value -> findAncestors(value, pool)).orElse(null);
-    var motherDto = mother.map(horse -> findAncestors(horse, pool)).orElse(null);
+    var fatherDto = father.map(value -> findAncestors(value, pool, maxGenerations - 1)).orElse(null);
+    var motherDto = mother.map(horse -> findAncestors(horse, pool, maxGenerations - 1)).orElse(null);
 
     // return child with parents
     return new HorseTreeDto(

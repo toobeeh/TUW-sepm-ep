@@ -213,8 +213,8 @@ public class HorseValidator {
    * validate horse ancestor search data
    *
    * @param id          the root horse
-   * @param generations the max generation hops, to be bigger than 0
-   * @throws ValidationException the generation param was smaller than 1 or the id was null
+   * @param generations the max generation hops, to be non-negative
+   * @throws ValidationException the generation param was negative or the id was null
    */
   public void validateForAncestorSearch(Long id, Long generations) throws ValidationException {
     LOG.trace("validateForAncestorSearch({}, {})", id, generations);
