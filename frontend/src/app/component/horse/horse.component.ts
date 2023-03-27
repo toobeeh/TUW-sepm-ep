@@ -3,7 +3,6 @@ import {
   AfterViewInit,
   Component,
   OnDestroy,
-  OnInit,
   ViewChild
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
@@ -19,7 +18,7 @@ import { Owner } from '../../dto/owner';
   templateUrl: './horse.component.html',
   styleUrls: ['./horse.component.scss'],
 })
-export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
+export class HorseComponent implements AfterViewInit, OnDestroy {
   @ViewChild('form', { static: true }) ngForm?: NgForm;
 
   horses: Horse[] = [];
@@ -52,11 +51,8 @@ export class HorseComponent implements OnInit, AfterViewInit, OnDestroy {
     return data;
   }
 
-  ngOnInit(): void {
-    this.reloadHorses();
-  }
-
   ngAfterViewInit(): void {
+    /* no load onInit needed because angular always emits a form change when default values are bound with ngmodel */
     this.formChanged = this.ngForm?.valueChanges
       ?.pipe(debounceTime(250))
       .subscribe(this.reloadHorses.bind(this));
