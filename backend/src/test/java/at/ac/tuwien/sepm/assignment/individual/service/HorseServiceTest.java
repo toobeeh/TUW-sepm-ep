@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles({"test", "datagen"}) // enable "test" spring profile during test execution in order to pick up configuration from application-test.yml
@@ -53,7 +54,7 @@ public class HorseServiceTest {
     assertThat(horses).extracting(HorseDetailDto::name).containsAnyElementsOf(List.of("Charles", "charles"));
   }
 
-  @Test()
+  @Test
   public void newWithMaleMotherShouldError() {
     Assertions.assertThrowsExactly(ConflictException.class, () -> {
       var maleHorse = horseService.getById(-31L);
@@ -65,12 +66,14 @@ public class HorseServiceTest {
   }
 
   @Test
+  @DirtiesContext
   public void sexShouldChange() throws NotFoundException, ValidationException, ConflictException {
     var hors = horseService.getById(-31L);
+    assertThat(hors.sex()).isEqualTo(Sex.MALE);
     var newHors =
         new HorseChildDetailDto(hors.id(), hors.name(), hors.description(), hors.dateOfBirth(), hors.sex() == Sex.MALE ? Sex.FEMALE : Sex.MALE, hors.owner(),
             hors.father(), hors.mother());
     var updatedHors = horseService.update(newHors);
-    assertThat(updatedHors.sex()).isNotEqualTo(hors.sex());
+    assertThat(updatedHors.sex()).isEqualTo(Sex.FEMALE);
   }
 }

@@ -49,8 +49,8 @@ public class OwnerEndpointTest {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(webAppContext).build();
   }
 
-  @Test()
-  @DirtiesContext()
+  @Test
+  @DirtiesContext
   public void newOwnerShouldCreate() throws Exception {
     var newOwner = new OwnerCreateDto("Kek", "Owner", "kek@owner.com");
 

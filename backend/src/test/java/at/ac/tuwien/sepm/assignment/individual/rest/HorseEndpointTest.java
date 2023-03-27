@@ -90,7 +90,7 @@ public class HorseEndpointTest {
     assertThat(horses).extracting(HorseDetailDto::name).containsAnyElementsOf(List.of("Charles", "charles"));
   }
 
-  @Test()
+  @Test
   public void newWithMaleMotherShouldError() throws Exception {
     byte[] getBody = mockMvc
         .perform(MockMvcRequestBuilders
@@ -121,9 +121,10 @@ public class HorseEndpointTest {
         ).andExpect(status().isOk())
         .andReturn().getResponse().getContentAsByteArray();
     HorseChildDetailDto maleHorse = objectMapper.readValue(getBody, HorseChildDetailDto.class);
+    assertThat(maleHorse.sex()).isEqualTo(Sex.MALE);
 
     var newHors = new HorseChildDetailDto(maleHorse.id(), maleHorse.name(), maleHorse.description(), maleHorse.dateOfBirth(),
-        maleHorse.sex() == Sex.MALE ? Sex.FEMALE : Sex.MALE, maleHorse.owner(),
+        Sex.FEMALE, maleHorse.owner(),
         maleHorse.father(), maleHorse.mother());
 
     byte[] putBody = mockMvc

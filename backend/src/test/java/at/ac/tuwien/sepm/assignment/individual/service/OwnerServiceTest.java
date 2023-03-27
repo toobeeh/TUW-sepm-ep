@@ -28,8 +28,8 @@ public class OwnerServiceTest {
   @Autowired
   OwnerService ownerService;
 
-  @Test()
-  @DirtiesContext()
+  @Test
+  @DirtiesContext
   public void newOwnerShouldCreate() throws ValidationException, ConflictException, NotFoundException {
     var newOwner = new OwnerCreateDto("Kek", "Owner", "kek@owner.com");
     var id = ownerService.create(newOwner).id();

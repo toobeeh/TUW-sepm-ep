@@ -27,9 +27,9 @@ public class OwnerDaoTest {
   @Autowired
   OwnerDao ownerDao;
 
-  @Test()
-  @DirtiesContext()
-  public void newOwnerShouldCreate() throws ValidationException, ConflictException, NotFoundException {
+  @Test
+  @DirtiesContext
+  public void newOwnerShouldCreate() throws NotFoundException {
     var newOwner = new OwnerCreateDto("Kek", "Owner", "kek@owner.com");
     var id = ownerDao.create(newOwner).getId();
     var check = ownerDao.getById(id);

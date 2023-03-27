@@ -67,11 +67,12 @@ public class HorseDaoTest {
   @DirtiesContext
   public void sexShouldChange() throws NotFoundException {
     var hors = horseDao.getById(-31L);
+    assertThat(hors.getSex()).isEqualTo(Sex.MALE);
     var newHors =
-        new HorseChildDetailDto(hors.getId(), hors.getName(), hors.getDescription(), hors.getDateOfBirth(), hors.getSex() == Sex.MALE ? Sex.FEMALE : Sex.MALE,
+        new HorseChildDetailDto(hors.getId(), hors.getName(), hors.getDescription(), hors.getDateOfBirth(), Sex.FEMALE,
             null,
             null, null);
     var updatedHors = horseDao.update(newHors);
-    assertThat(updatedHors.getSex()).isNotEqualTo(hors.getSex());
+    assertThat(updatedHors.getSex()).isEqualTo(Sex.FEMALE);
   }
 }
