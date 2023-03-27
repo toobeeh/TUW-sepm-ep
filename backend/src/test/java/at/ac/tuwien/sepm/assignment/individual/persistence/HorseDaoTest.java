@@ -47,6 +47,13 @@ public class HorseDaoTest {
   }
 
   @Test
+  public void getForNonExistentHorseShouldError() {
+    Assertions.assertThrowsExactly(NotFoundException.class, () -> {
+      horseDao.getById(100);
+    });
+  }
+
+  @Test
   public void ancestorsAreLimited() throws NotFoundException {
     List<Horse> horsesLimited = horseDao.getAncestors(-31, 5);
     List<Horse> horsesUnLimited = horseDao.getAncestors(-31, 10);
