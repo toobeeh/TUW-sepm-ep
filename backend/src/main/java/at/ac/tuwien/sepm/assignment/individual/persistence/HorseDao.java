@@ -38,7 +38,7 @@ public interface HorseDao {
    * @param horseId the horse to check for
    * @return false if no horse has this id as parent, or there is no horse with such id at all
    */
-  boolean parentExists(long horseId);
+  boolean isParent(long horseId);
 
   /**
    * Update the horse with the ID given in {@code horse}

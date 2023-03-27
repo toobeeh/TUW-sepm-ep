@@ -52,7 +52,7 @@ public class OwnerEndpointTest {
   @Test
   @DirtiesContext
   public void newOwnerShouldCreate() throws Exception {
-    var newOwner = new OwnerCreateDto("Kek", "Owner", "kek@owner.com");
+    var newOwner = new OwnerCreateDto("Endpoint", "Owner", "Endpoint@owner.com");
 
     byte[] postBody = mockMvc
         .perform(MockMvcRequestBuilders

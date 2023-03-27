@@ -31,7 +31,7 @@ public class OwnerServiceTest {
   @Test
   @DirtiesContext
   public void newOwnerShouldCreate() throws ValidationException, ConflictException, NotFoundException {
-    var newOwner = new OwnerCreateDto("Kek", "Owner", "kek@owner.com");
+    var newOwner = new OwnerCreateDto("Service", "Owner", "Service@owner.com");
     var id = ownerService.create(newOwner).id();
     var check = ownerService.getById(id);
 

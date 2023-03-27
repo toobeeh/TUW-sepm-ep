@@ -159,7 +159,7 @@ public class HorseJdbcDao implements HorseDao {
   }
 
   @Override
-  public boolean parentExists(long horseId) {
+  public boolean isParent(long horseId) {
     LOG.trace("isParent({})", horseId);
 
     List<Horse> horses;

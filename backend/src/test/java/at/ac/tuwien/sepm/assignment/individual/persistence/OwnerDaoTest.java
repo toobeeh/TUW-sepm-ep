@@ -30,7 +30,7 @@ public class OwnerDaoTest {
   @Test
   @DirtiesContext
   public void newOwnerShouldCreate() throws NotFoundException {
-    var newOwner = new OwnerCreateDto("Kek", "Owner", "kek@owner.com");
+    var newOwner = new OwnerCreateDto("Dao", "Owner", "dao@owner.com");
     var id = ownerDao.create(newOwner).getId();
     var check = ownerDao.getById(id);
 
