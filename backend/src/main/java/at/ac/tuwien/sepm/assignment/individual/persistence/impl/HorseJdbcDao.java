@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 
@@ -36,6 +37,7 @@ public class HorseJdbcDao implements HorseDao {
   private static final String TABLE_NAME = "horse";
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
   private static final String SQL_SELECT_BY_PARENT_ID = "SELECT * FROM " + TABLE_NAME + " WHERE father_id = ? OR mother_id = ?";
+  private static final String SQL_SELECT_OLDER_CHILDREN = "SELECT * FROM " + TABLE_NAME + " WHERE (mother_id = ? OR father_id = ?) AND date_of_birth < ?";
   private static final String SQL_GET_NTH_GEN_ANCESTORS = "SELECT *  FROM horse WHERE id IN ("
       + " WITH ancestors (id, name, mother_id, father_id, generation) AS ("
       + " SELECT id, name, father_id, mother_id, 0 AS generation"
@@ -156,6 +158,24 @@ public class HorseJdbcDao implements HorseDao {
     }
 
     return ancestors;
+  }
+
+  @Override
+  public boolean hasOlderChildren(long parentId, LocalDate parentBirth) {
+    LOG.trace("hasOlderChildren({})", parentId);
+
+    List<Horse> horses;
+    try {
+      horses = jdbcTemplate.query(SQL_SELECT_OLDER_CHILDREN, this::mapRow, parentId, parentId, Date.valueOf(parentBirth));
+    } catch (DataAccessException ex) {
+      throw new FatalException("The database query errored", ex);
+    }
+
+    if (horses.isEmpty()) {
+      return false;
+    }
+
+    return true;
   }
 
   @Override

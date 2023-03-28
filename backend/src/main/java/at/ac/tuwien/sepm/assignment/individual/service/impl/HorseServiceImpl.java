@@ -96,11 +96,12 @@ public class HorseServiceImpl implements HorseService {
 
     // get IDs of parents, fetch entity from db and convert to DTO for validator
     var simpleHorse = horse.withoutParents();
+    var hasOlderChildren = dao.hasOlderChildren(horse.id(), horse.dateOfBirth());
     var father = horse.father() == null ? null : dao.getById(horse.father().id());
     var mother = horse.mother() == null ? null : dao.getById(horse.mother().id());
     var fatherDto = father == null ? null : mapper.entityToDetailDto(father, ownerMapForSingleId(father.getOwnerId()));
     var motherDto = mother == null ? null : mapper.entityToDetailDto(mother, ownerMapForSingleId(mother.getOwnerId()));
-    validator.validateForUpdate(simpleHorse, fatherDto, motherDto);
+    validator.validateForUpdate(simpleHorse, fatherDto, motherDto, hasOlderChildren);
 
     var hasChildren = dao.isParent(horse.id());
     var originalSex = dao.getById(horse.id()).getSex();

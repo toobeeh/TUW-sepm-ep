@@ -159,7 +159,8 @@ public class HorseValidator {
    * @throws ValidationException the horse update data was invalid
    * @throws ConflictException   the horse update data caused conflict with its parents
    */
-  public void validateForUpdate(HorseDetailDto horse, HorseDetailDto father, HorseDetailDto mother) throws ValidationException, ConflictException {
+  public void validateForUpdate(HorseDetailDto horse, HorseDetailDto father, HorseDetailDto mother, boolean hasOlderChildren)
+      throws ValidationException, ConflictException {
     LOG.trace("validateForUpdate({}, {}, {})", horse, father, mother);
 
     // the most reusable way since there is no polymorphism in the DTOs, yuck...
@@ -175,6 +176,9 @@ public class HorseValidator {
     // check for conflicts if validation passed
     List<String> validationConflicts = new ArrayList<>();
     validateParents(validationConflicts, father, mother, horse.dateOfBirth(), horse.id());
+    if (hasOlderChildren) {
+      validationConflicts.add("Parent has children that are older than itself");
+    }
     if (!validationConflicts.isEmpty()) {
       throw new ConflictException("Data of horse for update has conflicts", validationConflicts);
     }

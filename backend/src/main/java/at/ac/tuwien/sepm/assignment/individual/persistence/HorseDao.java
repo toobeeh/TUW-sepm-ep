@@ -6,6 +6,7 @@ import at.ac.tuwien.sepm.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepm.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepm.assignment.individual.exception.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -30,6 +31,16 @@ public interface HorseDao {
    * @throws NotFoundException the root horse could not be found
    */
   List<Horse> getAncestors(long rootId, long generations) throws NotFoundException;
+
+
+  /**
+   * Checks if a horse has children that are older than it
+   *
+   * @param parentId    the parent horse's id
+   * @param parentBirth the parent horse's birthdate
+   * @return true if there are horses that have the parent horse as father or mother and are older than given date
+   */
+  boolean hasOlderChildren(long parentId, LocalDate parentBirth);
 
   /**
    * Check if there is a horse that is a parent with given id
